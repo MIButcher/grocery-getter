@@ -1,0 +1,11 @@
+# These files actually all configure themselves to be ignored, but it takes prettier forever (3+ seconds) to check
+# them, so ignoing them makes sense.
+.yarn/releases/**
+
+.pnp.cjs
+.pnp.loader.mjs
+
+Dockerfile
+
+# Webpack Output
+dist/**

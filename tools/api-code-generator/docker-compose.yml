@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+    generate-api-client-template:
+        # TODO: include sha tag
+        image: 'openapitools/openapi-generator-cli'
+        command: [
+            'generate',
+            '-i', 'http://host.docker.internal:5238/swagger/v1/swagger.json',
+            '-g', 'typescript-fetch',
+            '-o', '/local/out/dotnet-server',
+        ]
+        volumes:
+            - ./client/src/generated:/local/out/dotnet-server

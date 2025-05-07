@@ -1,0 +1,1 @@
+- [ ] talk about why there is a front and and backend project - no cors

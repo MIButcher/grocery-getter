@@ -1,0 +1,8 @@
+- **.Net 8** (LTS)
+- **React 18.2** (LTS)
+- **Typescript**
+- **Yarn 4** - Package manager [[0002-yarn-pnp]]
+	- **PnP** - Plug and Play install strategy
+- **Swagger** - Api Generation [[Swagger API Generation]]
+- **Vite** - Front end build tool [[0003-vite]]
+- **Jotai** - Atomic State Management for React [[0004-jotai]]

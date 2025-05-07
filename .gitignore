@@ -1,0 +1,21 @@
+# IDE / Tools
+.obsidian
+.vs
+.vscode
+.idea
+
+# Server
+server/obj/
+server/bin/
+
+# Client
+
+# Yarn
+client/.yarn/*
+!client/.yarn/patches
+!client/.yarn/plugins
+!client/.yarn/releases
+!client/.yarn/sdks
+!client/.yarn/versions
+client/.pnp.*
+client/node_modules/
