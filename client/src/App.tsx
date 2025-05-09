@@ -1,18 +1,15 @@
-import blueyGif from "./assets/bluey-unicorse.gif";
 import { setApiUri } from "./utilities/api_configurations";
-import { useAtom, Provider } from "jotai";
+import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import Count from "./components/Count";
-import Weather from "./components/Weather";
 import "./App.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from '@mui/material/CssBaseline';
 import { defaultTheme, darkTheme } from "./themes/index";
 import React from "react";
-import { Button } from "@mui/material";
+import AppRoutes from "./AppRoutes";
+import CardLinedHeader from "./components/CardLinedHeader";
+import { IconButton } from "@mui/material";
 import { DarkModeIcon, ContrastIcon } from "./imports/MaterialUIIcons";
-
-
 const darkModeAtom = atomWithStorage("darkMode", false);
 
 const createCustomTheme = (themeOptions: any, cssVariables: any) => ({
@@ -42,25 +39,22 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className="main-container">
-        <img src={blueyGif} className="blueyGif" alt="Unicorse dance" />
-        <h1>Ready to Code!</h1>
-        <h2>Vite + React {darkMode ? "default" : "dark"} theme</h2>
-        <Button onClick={() => setdarkMode(!darkMode)}>
-          {darkMode ? <DarkModeIcon /> : <ContrastIcon />} toggle theme
-        </Button>
-        <div className="card-row">
-          <Provider>
-            <Count counterId={1} />
-          </Provider>
-
-          <Provider>
-            <Count counterId={2} />
-          </Provider>
-        </div>
-
-        <Weather />
-      </div>
+      <CardLinedHeader
+        titleText='Grocery Getter'
+        sx={{
+          backgroundColor: theme.palette.background.container,
+          height: '2.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 1rem',
+          justifyContent: 'space-between',
+          borderRadius: 'unset',
+        }}>
+          <IconButton onClick={() => setdarkMode(!darkMode)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+            {darkMode ? <DarkModeIcon /> : <ContrastIcon />}
+          </IconButton>
+        </CardLinedHeader>
+      <AppRoutes />
     </ThemeProvider>
   );
 }

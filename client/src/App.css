@@ -6,7 +6,6 @@
 }
 
 .main-container {
-  border: 1px solid #cccccc;
   background-color: var(--background-container);
   color: var(--text-primary);
 }

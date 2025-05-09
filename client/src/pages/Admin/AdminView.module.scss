@@ -1,0 +1,12 @@
+@import "../../css/AdminViews.module.scss";
+
+:local {
+    .buttonsContainer {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        height: 90%;
+        justify-content: center;
+    }
+}

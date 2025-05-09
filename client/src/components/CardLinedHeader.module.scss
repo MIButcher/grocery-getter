@@ -1,0 +1,26 @@
+@import '../css/settings.scss';
+
+:Local {
+    .mainContainer {
+        margin: calc(#{$card-padding} * 0.5);
+        padding: $card-padding;
+    }
+
+    .header {
+        font-size: 1.375rem;
+        font-weight: bold;
+        color: var(--text-primary);
+        background-color: var(--background-default);
+        display: flex;
+        justify-content: space-between;
+        padding-top: 0.313rem;
+        padding-left: 0.313rem;
+        border-bottom: 0.125rem solid;
+        margin-bottom: 0.313rem;
+        width: 100%;
+    }
+
+    .header:first-child {
+        white-space: nowrap;
+    }
+}

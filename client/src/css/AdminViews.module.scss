@@ -1,0 +1,35 @@
+@import "./settings.scss";
+
+:local {
+    .mainContainer {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        height: 100vh;
+
+        .header {
+            font-size: 2rem;
+            color: var(--text-primary);
+        }
+    }
+
+    .gridContainer {
+        height: 80%;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        background-color: var(--table-background-color);
+    }
+
+    .actionsContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        height: 6rem;
+        margin-top: auto;
+    }
+
+    Button {
+        height: 4rem;
+    }
+}
