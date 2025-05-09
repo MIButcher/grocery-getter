@@ -26,12 +26,16 @@ export interface ApiAisleProductsPostRequest {
     aisleProduct?: AisleProduct;
 }
 
-export interface GetAisleProductsByAisleIdRequest {
-    aisleId: number;
+export interface GetAisleProductByIdRequest {
+    aisleProductId: number;
 }
 
-export interface GetAisleProductsByIdRequest {
-    aisleProductId: number;
+export interface GetAisleProductByProductIdRequest {
+    productId: number;
+}
+
+export interface GetAisleProductsByAisleIdRequest {
+    aisleId: number;
 }
 
 /**
@@ -90,6 +94,66 @@ export class AisleProductApi extends runtime.BaseAPI {
 
     /**
      */
+    async getAisleProductByIdRaw(requestParameters: GetAisleProductByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['aisleProductId'] == null) {
+            throw new runtime.RequiredError(
+                'aisleProductId',
+                'Required parameter "aisleProductId" was null or undefined when calling getAisleProductById().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/aisleProducts/{aisleProductId}`.replace(`{${"aisleProductId"}}`, encodeURIComponent(String(requestParameters['aisleProductId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async getAisleProductById(requestParameters: GetAisleProductByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.getAisleProductByIdRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async getAisleProductByProductIdRaw(requestParameters: GetAisleProductByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['productId'] == null) {
+            throw new runtime.RequiredError(
+                'productId',
+                'Required parameter "productId" was null or undefined when calling getAisleProductByProductId().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/aisleProducts/{productId}`.replace(`{${"productId"}}`, encodeURIComponent(String(requestParameters['productId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async getAisleProductByProductId(requestParameters: GetAisleProductByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.getAisleProductByProductIdRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async getAisleProductsByAisleIdRaw(requestParameters: GetAisleProductsByAisleIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['aisleId'] == null) {
             throw new runtime.RequiredError(
@@ -116,36 +180,6 @@ export class AisleProductApi extends runtime.BaseAPI {
      */
     async getAisleProductsByAisleId(requestParameters: GetAisleProductsByAisleIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.getAisleProductsByAisleIdRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async getAisleProductsByIdRaw(requestParameters: GetAisleProductsByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['aisleProductId'] == null) {
-            throw new runtime.RequiredError(
-                'aisleProductId',
-                'Required parameter "aisleProductId" was null or undefined when calling getAisleProductsById().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/aisleProducts/{aisleProductId}`.replace(`{${"aisleProductId"}}`, encodeURIComponent(String(requestParameters['aisleProductId']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async getAisleProductsById(requestParameters: GetAisleProductsByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getAisleProductsByIdRaw(requestParameters, initOverrides);
     }
 
 }

@@ -19,6 +19,13 @@ namespace GroceryGetter.Services
             return await _context.AisleProduct.FindAsync(aisleProductId);
         }
 
+        public async Task<AisleProduct?> GetAisleProductByProductId(int productId)
+        {
+            return await _context.AisleProduct
+                .Where(ap => ap.ProductId == productId)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<List<AisleProduct>> GetAisleProductsByAisleId(int aisleId)
         {
             return await _context.AisleProduct

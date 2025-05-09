@@ -15,10 +15,21 @@ namespace GroceryGetter.Controllers
             _aisleProductService = aisleProductService;
         }
 
-        [HttpGet("{aisleProductId}", Name = "GetAisleProductsById")]
+        [HttpGet("{aisleProductId}", Name = "GetAisleProductById")]
         public async Task<IActionResult> GetAisleProduct(int aisleProductId)
         {
             var aisleProduct = await _aisleProductService.GetAisleProductById(aisleProductId);
+            if (aisleProduct == null)
+            {
+                return NotFound();
+            }
+            return Ok(aisleProduct);
+        }
+
+        [HttpGet("{productId}", Name = "GetAisleProductByProductId")]
+        public async Task<IActionResult> GetAisleProductByProductId(int productId)
+        {
+            var aisleProduct = await _aisleProductService.GetAisleProductByProductId(productId);
             if (aisleProduct == null)
             {
                 return NotFound();
