@@ -1,10 +1,11 @@
 import React from 'react';
+import styles from './HomePageView.module.scss';
 
 const HomePage: React.FC = () => {
     return (
-        <div>
-            <h1>Welcome to GroceryGetter</h1>
-            <p>Your one-stop solution for managing groceries efficiently.</p>
+		<div className={styles.mainContainer}>
+			<div className={styles.header}>Welcome to Grocery Getter</div>
+            <div className={styles.msgContainer}>Your one-stop solution for managing groceries efficiently.</div>
         </div>
     );
 };

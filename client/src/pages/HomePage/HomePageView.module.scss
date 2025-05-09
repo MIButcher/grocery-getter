@@ -1,0 +1,25 @@
+@import "../../css/settings.scss";
+
+:local {
+    .mainContainer {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        justify-content: center;
+        height: 100vh;
+        gap: 2rem;
+        align-items: center;
+
+        .header {
+            font-size: 2rem;
+            color: var(--text-primary);
+        }
+
+        .msgContainer {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+}

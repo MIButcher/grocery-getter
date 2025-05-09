@@ -14,7 +14,7 @@ const LayoutPage: React.FC = () => {
 				<Button variant="outlined">
 					Add New Layout
 				</Button>
-				<Link to="/dashboard/mobile">Return to Dashboard</Link>
+				<Link to="/admin">Return to Admin Dashboard</Link>
 			</div>
 		</div>
 	);

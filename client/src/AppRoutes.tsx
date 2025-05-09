@@ -16,7 +16,7 @@ const AppRoutes = () => (
 			<Route path="/" element={<HomePage />} />
 			<Route path="/login" element={<LoginPage />} />
 			<Route path="/register" element={<RegisterPage />} />
-			<Route path="/dashboard/mobile" element={<AdminView />} />
+			<Route path="/admin" element={<AdminView />} />
 			<Route path="/aisle" element={<AislePage />} />
 			<Route path="/layout" element={<LayoutPage />} />
 			<Route path="/product" element={<ProductPage />} />

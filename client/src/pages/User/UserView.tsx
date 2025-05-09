@@ -14,7 +14,7 @@ const UserPage: React.FC = () => {
 				<Button variant="outlined">
 					Add New User
 				</Button>
-				<Link to="/dashboard/mobile">Return to Dashboard</Link>
+				<Link to="/admin">Return to Admin Dashboard</Link>
 			</div>
 		</div>
 	);
