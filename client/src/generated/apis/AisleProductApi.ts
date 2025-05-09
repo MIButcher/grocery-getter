@@ -137,8 +137,8 @@ export class AisleProductApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/aisleProducts/{productId}`.replace(`{${"productId"}}`, encodeURIComponent(String(requestParameters['productId']))),
-            method: 'GET',
+            path: `/api/aisleProducts/aisleProduct/{productId}`.replace(`{${"productId"}}`, encodeURIComponent(String(requestParameters['productId']))),
+            method: 'POST',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
@@ -167,7 +167,7 @@ export class AisleProductApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/aisleProducts/{aisleId}`.replace(`{${"aisleId"}}`, encodeURIComponent(String(requestParameters['aisleId']))),
+            path: `/api/aisleProducts/aisleProducts/{aisleId}`.replace(`{${"aisleId"}}`, encodeURIComponent(String(requestParameters['aisleId']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,

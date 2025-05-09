@@ -27,7 +27,7 @@ namespace GroceryGetter.Controllers
             return Ok(userProduct);
         }
 
-        [HttpGet("{productId}", Name = "GetUserProductByProductId")]
+        [HttpPost("userProduct/{productId}", Name = "GetUserProductByProductId")]
         public async Task<IActionResult> GetUserProductByProductId(int productId)
         {
             var userProduct = await _userProductService.GetUserProductByProductId(productId);
@@ -38,7 +38,7 @@ namespace GroceryGetter.Controllers
             return Ok(userProduct);
         }
 
-        [HttpPost("{userId}", Name = "GetUserProductsByUserId")]
+        [HttpPost("userProducts/{userId}", Name = "GetUserProductsByUserId")]
         public async Task<IActionResult> GetUserProductsByUserId(int userId)
         {
             var userProducts = await _userProductService.GetUserProductsByUserId(userId);
