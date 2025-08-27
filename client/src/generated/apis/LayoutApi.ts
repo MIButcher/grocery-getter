@@ -22,16 +22,16 @@ import {
     LayoutToJSON,
 } from '../models/index';
 
-export interface ApiLayoutsPostRequest {
-    layout?: Layout;
-}
-
 export interface GetLayoutByIdRequest {
     layoutId: number;
 }
 
 export interface GetLayoutsByStoreIdRequest {
     storeId: number;
+}
+
+export interface SaveLayoutRequest {
+    layout?: Layout;
 }
 
 /**
@@ -41,56 +41,7 @@ export class LayoutApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiLayoutsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/layouts`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiLayoutsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiLayoutsGetRaw(initOverrides);
-    }
-
-    /**
-     */
-    async apiLayoutsPostRaw(requestParameters: ApiLayoutsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/layouts`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: LayoutToJSON(requestParameters['layout']),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiLayoutsPost(requestParameters: ApiLayoutsPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiLayoutsPostRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async getLayoutByIdRaw(requestParameters: GetLayoutByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getLayoutByIdRaw(requestParameters: GetLayoutByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Layout>> {
         if (requestParameters['layoutId'] == null) {
             throw new runtime.RequiredError(
                 'layoutId',
@@ -102,25 +53,57 @@ export class LayoutApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/layouts/{layoutId}`;
+        urlPath = urlPath.replace(`{${"layoutId"}}`, encodeURIComponent(String(requestParameters['layoutId'])));
+
         const response = await this.request({
-            path: `/api/layouts/{layoutId}`.replace(`{${"layoutId"}}`, encodeURIComponent(String(requestParameters['layoutId']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => LayoutFromJSON(jsonValue));
     }
 
     /**
      */
-    async getLayoutById(requestParameters: GetLayoutByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getLayoutByIdRaw(requestParameters, initOverrides);
+    async getLayoutById(requestParameters: GetLayoutByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Layout> {
+        const response = await this.getLayoutByIdRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      */
-    async getLayoutsByStoreIdRaw(requestParameters: GetLayoutsByStoreIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getLayoutsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Layout>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/layouts`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(LayoutFromJSON));
+    }
+
+    /**
+     */
+    async getLayouts(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Layout>> {
+        const response = await this.getLayoutsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getLayoutsByStoreIdRaw(requestParameters: GetLayoutsByStoreIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Layout>>> {
         if (requestParameters['storeId'] == null) {
             throw new runtime.RequiredError(
                 'storeId',
@@ -132,20 +115,55 @@ export class LayoutApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/layouts/{storeId}`;
+        urlPath = urlPath.replace(`{${"storeId"}}`, encodeURIComponent(String(requestParameters['storeId'])));
+
         const response = await this.request({
-            path: `/api/layouts/{storeId}`.replace(`{${"storeId"}}`, encodeURIComponent(String(requestParameters['storeId']))),
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(LayoutFromJSON));
     }
 
     /**
      */
-    async getLayoutsByStoreId(requestParameters: GetLayoutsByStoreIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getLayoutsByStoreIdRaw(requestParameters, initOverrides);
+    async getLayoutsByStoreId(requestParameters: GetLayoutsByStoreIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Layout>> {
+        const response = await this.getLayoutsByStoreIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async saveLayoutRaw(requestParameters: SaveLayoutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Layout>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/layouts`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: LayoutToJSON(requestParameters['layout']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => LayoutFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async saveLayout(requestParameters: SaveLayoutRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Layout> {
+        const response = await this.saveLayoutRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

@@ -35,7 +35,7 @@ if (builder.Environment.IsDevelopment())
 {
     // Allow arbitrary client browser apps to access the API.
     // In a production environment, make sure to allow only origins you trust.
-    builder.Services.AddCors(cors => cors.AddDefaultPolicy(policy => policy
+    builder.Services.AddCors(cors => cors.AddPolicy("AllowAllOrigins", policy => policy
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowAnyOrigin()
@@ -60,7 +60,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors();
+app.UseCors("AllowAllOrigins");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

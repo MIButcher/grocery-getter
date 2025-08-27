@@ -15,15 +15,57 @@
 
 import * as runtime from '../runtime';
 import type {
+  AddUserProductsResult,
+  FullUserProductRequest,
+  GroceryListItem,
+  StoreLayoutAisleData,
   UserProduct,
+  UserProductsCriteria,
+  UserProductsMergeCriteria,
 } from '../models/index';
 import {
+    AddUserProductsResultFromJSON,
+    AddUserProductsResultToJSON,
+    FullUserProductRequestFromJSON,
+    FullUserProductRequestToJSON,
+    GroceryListItemFromJSON,
+    GroceryListItemToJSON,
+    StoreLayoutAisleDataFromJSON,
+    StoreLayoutAisleDataToJSON,
     UserProductFromJSON,
     UserProductToJSON,
+    UserProductsCriteriaFromJSON,
+    UserProductsCriteriaToJSON,
+    UserProductsMergeCriteriaFromJSON,
+    UserProductsMergeCriteriaToJSON,
 } from '../models/index';
 
-export interface ApiUserProductsPostRequest {
-    userProduct?: UserProduct;
+export interface AddUserProductRequest {
+    fullUserProductRequest?: FullUserProductRequest;
+}
+
+export interface AddUserProductsRequest {
+    userProductsCriteria?: UserProductsCriteria;
+}
+
+export interface DeleteGroceryListRequest {
+    userId: number;
+}
+
+export interface DeleteUserProductRequest {
+    userProductId: number;
+}
+
+export interface GetGroceryListItemByIdRequest {
+    userProductId: number;
+}
+
+export interface GetGroceryListItemByProductIdRequest {
+    productId: number;
+}
+
+export interface GetGroceryListItemsByUserIdRequest {
+    userId: number;
 }
 
 export interface GetUserProductByIdRequest {
@@ -38,6 +80,18 @@ export interface GetUserProductsByUserIdRequest {
     userId: number;
 }
 
+export interface MergeUserProductsRequest {
+    userProductsMergeCriteria?: UserProductsMergeCriteria;
+}
+
+export interface SaveGroceryListItemRequest {
+    groceryListItem?: GroceryListItem;
+}
+
+export interface SaveUserProductRequest {
+    userProduct?: UserProduct;
+}
+
 /**
  * 
  */
@@ -45,42 +99,87 @@ export class UserProductApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiUserProductsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/userProducts`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiUserProductsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiUserProductsGetRaw(initOverrides);
-    }
-
-    /**
-     */
-    async apiUserProductsPostRaw(requestParameters: ApiUserProductsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async addUserProductRaw(requestParameters: AddUserProductRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AddUserProductsResult>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/api/userProducts/userProduct/add`;
+
         const response = await this.request({
-            path: `/api/userProducts`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: UserProductToJSON(requestParameters['userProduct']),
+            body: FullUserProductRequestToJSON(requestParameters['fullUserProductRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AddUserProductsResultFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async addUserProduct(requestParameters: AddUserProductRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AddUserProductsResult> {
+        const response = await this.addUserProductRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async addUserProductsRaw(requestParameters: AddUserProductsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AddUserProductsResult>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/userProducts/userProducts/add`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserProductsCriteriaToJSON(requestParameters['userProductsCriteria']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AddUserProductsResultFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async addUserProducts(requestParameters: AddUserProductsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AddUserProductsResult> {
+        const response = await this.addUserProductsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async deleteGroceryListRaw(requestParameters: DeleteGroceryListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling deleteGroceryList().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/userProducts/userProducts/deleteList/{userId}`;
+        urlPath = urlPath.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -88,13 +187,179 @@ export class UserProductApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiUserProductsPost(requestParameters: ApiUserProductsPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiUserProductsPostRaw(requestParameters, initOverrides);
+    async deleteGroceryList(requestParameters: DeleteGroceryListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteGroceryListRaw(requestParameters, initOverrides);
     }
 
     /**
      */
-    async getUserProductByIdRaw(requestParameters: GetUserProductByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteUserProductRaw(requestParameters: DeleteUserProductRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['userProductId'] == null) {
+            throw new runtime.RequiredError(
+                'userProductId',
+                'Required parameter "userProductId" was null or undefined when calling deleteUserProduct().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/userProducts/userProduct/delete/{userProductId}`;
+        urlPath = urlPath.replace(`{${"userProductId"}}`, encodeURIComponent(String(requestParameters['userProductId'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteUserProduct(requestParameters: DeleteUserProductRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteUserProductRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async getAddNewUserProductDataRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StoreLayoutAisleData>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/userProducts/storeLayoutAisleData`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => StoreLayoutAisleDataFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getAddNewUserProductData(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StoreLayoutAisleData> {
+        const response = await this.getAddNewUserProductDataRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getGroceryListItemByIdRaw(requestParameters: GetGroceryListItemByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GroceryListItem>> {
+        if (requestParameters['userProductId'] == null) {
+            throw new runtime.RequiredError(
+                'userProductId',
+                'Required parameter "userProductId" was null or undefined when calling getGroceryListItemById().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/userProducts/groceryListItem/{userProductId}`;
+        urlPath = urlPath.replace(`{${"userProductId"}}`, encodeURIComponent(String(requestParameters['userProductId'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GroceryListItemFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getGroceryListItemById(requestParameters: GetGroceryListItemByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GroceryListItem> {
+        const response = await this.getGroceryListItemByIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getGroceryListItemByProductIdRaw(requestParameters: GetGroceryListItemByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GroceryListItem>> {
+        if (requestParameters['productId'] == null) {
+            throw new runtime.RequiredError(
+                'productId',
+                'Required parameter "productId" was null or undefined when calling getGroceryListItemByProductId().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/userProducts/groceryListItem/product/{productId}`;
+        urlPath = urlPath.replace(`{${"productId"}}`, encodeURIComponent(String(requestParameters['productId'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GroceryListItemFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getGroceryListItemByProductId(requestParameters: GetGroceryListItemByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GroceryListItem> {
+        const response = await this.getGroceryListItemByProductIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getGroceryListItemsByUserIdRaw(requestParameters: GetGroceryListItemsByUserIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<GroceryListItem>>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling getGroceryListItemsByUserId().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/userProducts/groceryListItems/user/{userId}`;
+        urlPath = urlPath.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(GroceryListItemFromJSON));
+    }
+
+    /**
+     */
+    async getGroceryListItemsByUserId(requestParameters: GetGroceryListItemsByUserIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<GroceryListItem>> {
+        const response = await this.getGroceryListItemsByUserIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getUserProductByIdRaw(requestParameters: GetUserProductByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserProduct>> {
         if (requestParameters['userProductId'] == null) {
             throw new runtime.RequiredError(
                 'userProductId',
@@ -106,25 +371,30 @@ export class UserProductApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/userProducts/userProduct/{userProductId}`;
+        urlPath = urlPath.replace(`{${"userProductId"}}`, encodeURIComponent(String(requestParameters['userProductId'])));
+
         const response = await this.request({
-            path: `/api/userProducts/{userProductId}`.replace(`{${"userProductId"}}`, encodeURIComponent(String(requestParameters['userProductId']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserProductFromJSON(jsonValue));
     }
 
     /**
      */
-    async getUserProductById(requestParameters: GetUserProductByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getUserProductByIdRaw(requestParameters, initOverrides);
+    async getUserProductById(requestParameters: GetUserProductByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserProduct> {
+        const response = await this.getUserProductByIdRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      */
-    async getUserProductByProductIdRaw(requestParameters: GetUserProductByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getUserProductByProductIdRaw(requestParameters: GetUserProductByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserProduct>> {
         if (requestParameters['productId'] == null) {
             throw new runtime.RequiredError(
                 'productId',
@@ -136,25 +406,57 @@ export class UserProductApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/userProducts/userProduct/product/{productId}`;
+        urlPath = urlPath.replace(`{${"productId"}}`, encodeURIComponent(String(requestParameters['productId'])));
+
         const response = await this.request({
-            path: `/api/userProducts/userProduct/{productId}`.replace(`{${"productId"}}`, encodeURIComponent(String(requestParameters['productId']))),
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserProductFromJSON(jsonValue));
     }
 
     /**
      */
-    async getUserProductByProductId(requestParameters: GetUserProductByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getUserProductByProductIdRaw(requestParameters, initOverrides);
+    async getUserProductByProductId(requestParameters: GetUserProductByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserProduct> {
+        const response = await this.getUserProductByProductIdRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      */
-    async getUserProductsByUserIdRaw(requestParameters: GetUserProductsByUserIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getUserProductsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserProduct>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/userProducts/userProducts`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserProductFromJSON));
+    }
+
+    /**
+     */
+    async getUserProducts(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserProduct>> {
+        const response = await this.getUserProductsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getUserProductsByUserIdRaw(requestParameters: GetUserProductsByUserIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserProduct>>> {
         if (requestParameters['userId'] == null) {
             throw new runtime.RequiredError(
                 'userId',
@@ -166,20 +468,119 @@ export class UserProductApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/userProducts/userProducts/user/{userId}`;
+        urlPath = urlPath.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId'])));
+
         const response = await this.request({
-            path: `/api/userProducts/userProducts/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserProductFromJSON));
     }
 
     /**
      */
-    async getUserProductsByUserId(requestParameters: GetUserProductsByUserIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getUserProductsByUserIdRaw(requestParameters, initOverrides);
+    async getUserProductsByUserId(requestParameters: GetUserProductsByUserIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserProduct>> {
+        const response = await this.getUserProductsByUserIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async mergeUserProductsRaw(requestParameters: MergeUserProductsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<GroceryListItem>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/userProducts/userProducts/merge`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserProductsMergeCriteriaToJSON(requestParameters['userProductsMergeCriteria']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(GroceryListItemFromJSON));
+    }
+
+    /**
+     */
+    async mergeUserProducts(requestParameters: MergeUserProductsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<GroceryListItem>> {
+        const response = await this.mergeUserProductsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async saveGroceryListItemRaw(requestParameters: SaveGroceryListItemRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<boolean>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/userProducts/groceryListItem`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: GroceryListItemToJSON(requestParameters['groceryListItem']),
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<boolean>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     */
+    async saveGroceryListItem(requestParameters: SaveGroceryListItemRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean> {
+        const response = await this.saveGroceryListItemRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async saveUserProductRaw(requestParameters: SaveUserProductRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserProduct>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/userProducts/userProduct/save`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserProductToJSON(requestParameters['userProduct']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserProductFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async saveUserProduct(requestParameters: SaveUserProductRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserProduct> {
+        const response = await this.saveUserProductRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

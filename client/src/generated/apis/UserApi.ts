@@ -15,19 +15,37 @@
 
 import * as runtime from '../runtime';
 import type {
+  IdNameLink,
   User,
+  UserListShareRequest,
 } from '../models/index';
 import {
+    IdNameLinkFromJSON,
+    IdNameLinkToJSON,
     UserFromJSON,
     UserToJSON,
+    UserListShareRequestFromJSON,
+    UserListShareRequestToJSON,
 } from '../models/index';
 
-export interface ApiUsersPostRequest {
-    user?: User;
+export interface GetSharedUsersRequest {
+    userId: number;
 }
 
 export interface GetUserByIdRequest {
     userId: number;
+}
+
+export interface LoginUserRequest {
+    user?: User;
+}
+
+export interface SaveUserRequest {
+    user?: User;
+}
+
+export interface SaveUserShareListRequest {
+    userListShareRequest?: UserListShareRequest;
 }
 
 /**
@@ -37,56 +55,42 @@ export class UserApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiUsersGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getSharedUsersRaw(requestParameters: GetSharedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IdNameLink>>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling getSharedUsers().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/users/shared/{userId}`;
+        urlPath = urlPath.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId'])));
+
         const response = await this.request({
-            path: `/api/users`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(IdNameLinkFromJSON));
     }
 
     /**
      */
-    async apiUsersGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiUsersGetRaw(initOverrides);
+    async getSharedUsers(requestParameters: GetSharedUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<IdNameLink>> {
+        const response = await this.getSharedUsersRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      */
-    async apiUsersPostRaw(requestParameters: ApiUsersPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/users`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: UserToJSON(requestParameters['user']),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiUsersPost(requestParameters: ApiUsersPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiUsersPostRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async getUserByIdRaw(requestParameters: GetUserByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getUserByIdRaw(requestParameters: GetUserByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<User>> {
         if (requestParameters['userId'] == null) {
             throw new runtime.RequiredError(
                 'userId',
@@ -98,20 +102,142 @@ export class UserApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/users/{userId}`;
+        urlPath = urlPath.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId'])));
+
         const response = await this.request({
-            path: `/api/users/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
     }
 
     /**
      */
-    async getUserById(requestParameters: GetUserByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getUserByIdRaw(requestParameters, initOverrides);
+    async getUserById(requestParameters: GetUserByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<User> {
+        const response = await this.getUserByIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getUsersRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<User>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/users`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserFromJSON));
+    }
+
+    /**
+     */
+    async getUsers(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<User>> {
+        const response = await this.getUsersRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async loginUserRaw(requestParameters: LoginUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<User>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/users/login`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserToJSON(requestParameters['user']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async loginUser(requestParameters: LoginUserRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<User> {
+        const response = await this.loginUserRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async saveUserRaw(requestParameters: SaveUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<User>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/users`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserToJSON(requestParameters['user']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async saveUser(requestParameters: SaveUserRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<User> {
+        const response = await this.saveUserRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async saveUserShareListRaw(requestParameters: SaveUserShareListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<User>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/users/shareList`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserListShareRequestToJSON(requestParameters['userListShareRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async saveUserShareList(requestParameters: SaveUserShareListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<User> {
+        const response = await this.saveUserShareListRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

@@ -31,9 +31,29 @@ namespace GroceryGetter.Services
             return await _context.Aisle.ToListAsync();
         }
 
-        public async Task<Aisle> AddAisle(Aisle aisle)
+        public async Task<Aisle> SaveAisle(Aisle aisle)
         {
-            _context.Aisle.Add(aisle);
+            bool isDuplicate = await _context.Aisle
+                .AnyAsync(a => a.LayoutId == aisle.LayoutId && a.Name == aisle.Name && a.Id != aisle.Id);
+
+            if (isDuplicate)
+            {
+                throw new InvalidOperationException($"An aisle with the name '{aisle.Name}' already exists in this layout.");
+            }
+
+            if (aisle.Id > 0)
+            {
+                var existingAisle = await _context.Aisle.FindAsync(aisle.Id);
+                if (existingAisle != null)
+                {
+                    _context.Entry(existingAisle).CurrentValues.SetValues(aisle);
+                }
+            }
+            else
+            {
+                _context.Aisle.Add(aisle);
+            }
+
             await _context.SaveChangesAsync();
             return aisle;
         }

@@ -13,6 +13,21 @@
  */
 
 import { mapValues } from '../runtime';
+import type { User } from './User';
+import {
+    UserFromJSON,
+    UserFromJSONTyped,
+    UserToJSON,
+    UserToJSONTyped,
+} from './User';
+import type { Product } from './Product';
+import {
+    ProductFromJSON,
+    ProductFromJSONTyped,
+    ProductToJSON,
+    ProductToJSONTyped,
+} from './Product';
+
 /**
  * 
  * @export
@@ -55,6 +70,18 @@ export interface UserProduct {
      * @memberof UserProduct
      */
     notes?: string | null;
+    /**
+     * 
+     * @type {User}
+     * @memberof UserProduct
+     */
+    user?: User;
+    /**
+     * 
+     * @type {Product}
+     * @memberof UserProduct
+     */
+    product?: Product;
 }
 
 /**
@@ -80,6 +107,8 @@ export function UserProductFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'inCart': json['inCart'] == null ? undefined : json['inCart'],
         'quantity': json['quantity'] == null ? undefined : json['quantity'],
         'notes': json['notes'] == null ? undefined : json['notes'],
+        'user': json['user'] == null ? undefined : UserFromJSON(json['user']),
+        'product': json['product'] == null ? undefined : ProductFromJSON(json['product']),
     };
 }
 
@@ -100,6 +129,8 @@ export function UserProductToJSONTyped(value?: UserProduct | null, ignoreDiscrim
         'inCart': value['inCart'],
         'quantity': value['quantity'],
         'notes': value['notes'],
+        'user': UserToJSON(value['user']),
+        'product': ProductToJSON(value['product']),
     };
 }
 

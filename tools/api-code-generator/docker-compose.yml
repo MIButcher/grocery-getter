@@ -1,5 +1,3 @@
-version: "3.7"
-
 services:
     generate-api-client-template:
         # TODO: include sha tag

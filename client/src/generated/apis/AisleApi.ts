@@ -22,16 +22,16 @@ import {
     AisleToJSON,
 } from '../models/index';
 
-export interface ApiAislesPostRequest {
-    aisle?: Aisle;
-}
-
 export interface GetAisleByIdRequest {
     aisleId: number;
 }
 
 export interface GetAisleByLayoutIdRequest {
     layoutId: number;
+}
+
+export interface SaveAisleRequest {
+    aisle?: Aisle;
 }
 
 /**
@@ -41,56 +41,7 @@ export class AisleApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAislesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/aisles`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiAislesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAislesGetRaw(initOverrides);
-    }
-
-    /**
-     */
-    async apiAislesPostRaw(requestParameters: ApiAislesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/aisles`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: AisleToJSON(requestParameters['aisle']),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiAislesPost(requestParameters: ApiAislesPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAislesPostRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async getAisleByIdRaw(requestParameters: GetAisleByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getAisleByIdRaw(requestParameters: GetAisleByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Aisle>> {
         if (requestParameters['aisleId'] == null) {
             throw new runtime.RequiredError(
                 'aisleId',
@@ -102,25 +53,30 @@ export class AisleApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/aisles/{aisleId}`;
+        urlPath = urlPath.replace(`{${"aisleId"}}`, encodeURIComponent(String(requestParameters['aisleId'])));
+
         const response = await this.request({
-            path: `/api/aisles/{aisleId}`.replace(`{${"aisleId"}}`, encodeURIComponent(String(requestParameters['aisleId']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => AisleFromJSON(jsonValue));
     }
 
     /**
      */
-    async getAisleById(requestParameters: GetAisleByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getAisleByIdRaw(requestParameters, initOverrides);
+    async getAisleById(requestParameters: GetAisleByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Aisle> {
+        const response = await this.getAisleByIdRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      */
-    async getAisleByLayoutIdRaw(requestParameters: GetAisleByLayoutIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getAisleByLayoutIdRaw(requestParameters: GetAisleByLayoutIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Aisle>>> {
         if (requestParameters['layoutId'] == null) {
             throw new runtime.RequiredError(
                 'layoutId',
@@ -132,20 +88,82 @@ export class AisleApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/aisles/{layoutId}`;
+        urlPath = urlPath.replace(`{${"layoutId"}}`, encodeURIComponent(String(requestParameters['layoutId'])));
+
         const response = await this.request({
-            path: `/api/aisles/{layoutId}`.replace(`{${"layoutId"}}`, encodeURIComponent(String(requestParameters['layoutId']))),
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AisleFromJSON));
     }
 
     /**
      */
-    async getAisleByLayoutId(requestParameters: GetAisleByLayoutIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getAisleByLayoutIdRaw(requestParameters, initOverrides);
+    async getAisleByLayoutId(requestParameters: GetAisleByLayoutIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Aisle>> {
+        const response = await this.getAisleByLayoutIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getAislesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Aisle>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/aisles`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AisleFromJSON));
+    }
+
+    /**
+     */
+    async getAisles(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Aisle>> {
+        const response = await this.getAislesRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async saveAisleRaw(requestParameters: SaveAisleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Aisle>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/aisles`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AisleToJSON(requestParameters['aisle']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AisleFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async saveAisle(requestParameters: SaveAisleRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Aisle> {
+        const response = await this.saveAisleRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

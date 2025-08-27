@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Layout } from './Layout';
+import {
+    LayoutFromJSON,
+    LayoutFromJSONTyped,
+    LayoutToJSON,
+    LayoutToJSONTyped,
+} from './Layout';
+
 /**
  * 
  * @export
@@ -43,6 +51,12 @@ export interface Aisle {
      * @memberof Aisle
      */
     lineup?: number;
+    /**
+     * 
+     * @type {Layout}
+     * @memberof Aisle
+     */
+    layout?: Layout;
 }
 
 /**
@@ -66,6 +80,7 @@ export function AisleFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ais
         'layoutId': json['layoutId'] == null ? undefined : json['layoutId'],
         'name': json['name'] == null ? undefined : json['name'],
         'lineup': json['lineup'] == null ? undefined : json['lineup'],
+        'layout': json['layout'] == null ? undefined : LayoutFromJSON(json['layout']),
     };
 }
 
@@ -84,6 +99,7 @@ export function AisleToJSONTyped(value?: Aisle | null, ignoreDiscriminator: bool
         'layoutId': value['layoutId'],
         'name': value['name'],
         'lineup': value['lineup'],
+        'layout': LayoutToJSON(value['layout']),
     };
 }
 

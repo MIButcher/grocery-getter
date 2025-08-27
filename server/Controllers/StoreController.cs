@@ -2,39 +2,55 @@ using GroceryGetter.Models;
 using GroceryGetter.DomainServices; // Updated namespace
 using Microsoft.AspNetCore.Mvc;
 
-[ApiController]
-[Route("api/stores")]
-public class StoreController : ControllerBase
+namespace GroceryGetter.Controllers
 {
-    private readonly IStoreService _storeService;
 
-    public StoreController(IStoreService storeService)
+    [ApiController]
+    [Route("api/stores")]
+    public class StoreController : ControllerBase
     {
-        _storeService = storeService;
-    }
+        private readonly IStoreService _storeService;
 
-    [HttpGet("{storeId}", Name = "GetStoreById")]
-    public async Task<IActionResult> GetStore(int storeId)
-    {
-        var store = await _storeService.GetStoreById(storeId);
-        if (store == null)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StoreController"/> class.
+        /// </summary>
+        /// <param name="storeService">Service for store operations.</param>
+        public StoreController(IStoreService storeService)
         {
-            return NotFound();
+            _storeService = storeService;
         }
-        return Ok(store);
-    }
 
-    [HttpGet]
-    public async Task<IActionResult> GetStores()
-    {
-        var stores = await _storeService.GetAllStores();
-        return Ok(stores);
-    }
+        /// <summary>
+        /// Retrieves a store by its unique identifier.
+        /// </summary>
+        /// <param name="storeId">The ID of the store to retrieve.</param>
+        /// <returns>The store if found; otherwise, null.</returns>
+        [HttpGet("{storeId}", Name = "GetStoreById")]
+        public async Task<Store?> GetStore(int storeId)
+        {
+            return await _storeService.GetStoreById(storeId);
+        }
 
-    [HttpPost]
-    public async Task<IActionResult> AddStore(Store store)
-    {
-        var createdStore = await _storeService.AddStore(store);
-        return CreatedAtAction(nameof(GetStores), new { id = createdStore.Id }, createdStore);
+        /// <summary>
+        /// Retrieves all stores.
+        /// </summary>
+        /// <returns>A list of all stores.</returns>
+        [HttpGet(Name = "GetStores")]
+        public async Task<IEnumerable<Store>> GetStores()
+        {
+            return await _storeService.GetAllStores();
+        }
+
+        /// <summary>
+        /// Saves a store. Creates a new store or updates an existing one.
+        /// </summary>
+        /// <param name="store">The store to save.</param>
+        /// <returns>The saved store entity.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if a store with the same name already exists.</exception>
+        [HttpPost(Name = "SaveStore")]
+        public async Task<Store> SaveStore(Store store)
+        {
+            return await _storeService.SaveStore(store);
+        }
     }
 }

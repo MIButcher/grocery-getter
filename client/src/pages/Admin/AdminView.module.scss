@@ -1,4 +1,4 @@
-@import "../../css/AdminViews.module.scss";
+@import "@css/AdminViews.module.scss";
 
 :local {
     .buttonsContainer {
@@ -8,5 +8,7 @@
         gap: 2rem;
         height: 90%;
         justify-content: center;
+        width: 65%;
+        align-self: center;
     }
 }

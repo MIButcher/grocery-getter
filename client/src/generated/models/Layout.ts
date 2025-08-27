@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Store } from './Store';
+import {
+    StoreFromJSON,
+    StoreFromJSONTyped,
+    StoreToJSON,
+    StoreToJSONTyped,
+} from './Store';
+
 /**
  * 
  * @export
@@ -37,6 +45,18 @@ export interface Layout {
      * @memberof Layout
      */
     name?: string | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Layout
+     */
+    isActive?: boolean;
+    /**
+     * 
+     * @type {Store}
+     * @memberof Layout
+     */
+    store?: Store;
 }
 
 /**
@@ -59,6 +79,8 @@ export function LayoutFromJSONTyped(json: any, ignoreDiscriminator: boolean): La
         'id': json['id'] == null ? undefined : json['id'],
         'storeId': json['storeId'] == null ? undefined : json['storeId'],
         'name': json['name'] == null ? undefined : json['name'],
+        'isActive': json['isActive'] == null ? undefined : json['isActive'],
+        'store': json['store'] == null ? undefined : StoreFromJSON(json['store']),
     };
 }
 
@@ -76,6 +98,8 @@ export function LayoutToJSONTyped(value?: Layout | null, ignoreDiscriminator: bo
         'id': value['id'],
         'storeId': value['storeId'],
         'name': value['name'],
+        'isActive': value['isActive'],
+        'store': StoreToJSON(value['store']),
     };
 }
 

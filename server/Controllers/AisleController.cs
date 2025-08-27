@@ -10,45 +10,59 @@ namespace GroceryGetter.Controllers
     {
         private readonly IAisleService _aisleService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AisleController"/> class.
+        /// </summary>
+        /// <param name="aisleService">Service for aisle operations.</param>
         public AisleController(IAisleService aisleService)
         {
             _aisleService = aisleService;
         }
 
+        /// <summary>
+        /// Retrieves an aisle by its unique identifier.
+        /// </summary>
+        /// <param name="aisleId">The ID of the aisle to retrieve.</param>
+        /// <returns>The aisle if found; otherwise, null.</returns>
         [HttpGet("{aisleId}", Name = "GetAisleById")]
-        public async Task<IActionResult> GetAisleById(int aisleId)
+        public async Task<Aisle?> GetAisleById(int aisleId)
         {
-            var aisle = await _aisleService.GetAisleById(aisleId);
-            if (aisle == null)
-            {
-                return NotFound();
-            }
-            return Ok(aisle);
+            return await _aisleService.GetAisleById(aisleId);
         }
 
+        /// <summary>
+        /// Retrieves all aisles associated with a specific layout.
+        /// </summary>
+        /// <param name="layoutId">The ID of the layout.</param>
+        /// <returns>A list of aisles for the specified layout.</returns>
         [HttpPost("{layoutId}", Name = "GetAisleByLayoutId")]
-        public async Task<IActionResult> GetAisleByLayoutId(int layoutId)
+        public async Task<IEnumerable<Aisle>> GetAislesByLayoutId(int layoutId)
         {
-            var aisle = await _aisleService.GetAisleByLayoutId(layoutId);
-            if (aisle == null)
-            {
-                return NotFound();
-            }
-            return Ok(aisle);
+            return await _aisleService.GetAisleByLayoutId(layoutId);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAisles()
+        /// <summary>
+        /// Retrieves all aisles in the system.
+        /// </summary>
+        /// <returns>A list of all aisles.</returns>
+        [HttpGet(Name = "GetAisles")]
+        public async Task<IEnumerable<Aisle>> GetAisles()
         {
-            var aisles = await _aisleService.GetAllAisles();
-            return Ok(aisles);
+            return await _aisleService.GetAllAisles();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddAisle(Aisle aisle)
+        /// <summary>
+        /// Saves an aisle. Creates a new aisle or updates an existing one.
+        /// </summary>
+        /// <param name="aisle">The aisle to save.</param>
+        /// <returns>The saved aisle entity.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if an aisle with the same name already exists in the layout.
+        /// </exception>
+        [HttpPost(Name = "SaveAisle")]
+        public async Task<Aisle> SaveAisle(Aisle aisle)
         {
-            var createdAisle = await _aisleService.AddAisle(aisle);
-            return CreatedAtAction(nameof(GetAisles), new { id = createdAisle.Id }, createdAisle);
+            return await _aisleService.SaveAisle(aisle);
         }
     }
 }

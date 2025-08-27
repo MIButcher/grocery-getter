@@ -10,56 +10,67 @@ namespace GroceryGetter.Controllers
     {
         private readonly IAisleProductService _aisleProductService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AisleProductController"/> class.
+        /// </summary>
+        /// <param name="aisleProductService">Service for aisle-product operations.</param>
         public AisleProductController(IAisleProductService aisleProductService)
         {
             _aisleProductService = aisleProductService;
         }
 
+        /// <summary>
+        /// Retrieves an aisle-product entry by its unique identifier.
+        /// </summary>
+        /// <param name="aisleProductId">The ID of the aisle-product entry.</param>
+        /// <returns>The aisle-product entry if found; otherwise, null.</returns>
         [HttpGet("{aisleProductId}", Name = "GetAisleProductById")]
-        public async Task<IActionResult> GetAisleProduct(int aisleProductId)
+        public async Task<AisleProduct?> GetAisleProduct(int aisleProductId)
         {
-            var aisleProduct = await _aisleProductService.GetAisleProductById(aisleProductId);
-            if (aisleProduct == null)
-            {
-                return NotFound();
-            }
-            return Ok(aisleProduct);
+            return await _aisleProductService.GetAisleProductById(aisleProductId);
         }
 
+        /// <summary>
+        /// Retrieves the aisle-product entry associated with a specific product.
+        /// </summary>
+        /// <param name="productId">The ID of the product.</param>
+        /// <returns>The aisle-product entry if found; otherwise, null.</returns>
         [HttpPost("aisleProduct/{productId}", Name = "GetAisleProductByProductId")]
-        public async Task<IActionResult> GetAisleProductByProductId(int productId)
+        public async Task<AisleProduct?> GetAisleProductByProductId(int productId)
         {
-            var aisleProduct = await _aisleProductService.GetAisleProductByProductId(productId);
-            if (aisleProduct == null)
-            {
-                return NotFound();
-            }
-            return Ok(aisleProduct);
+            return await _aisleProductService.GetAisleProductByProductId(productId);
         }
 
+        /// <summary>
+        /// Retrieves all aisle-product entries associated with a specific aisle.
+        /// </summary>
+        /// <param name="aisleId">The ID of the aisle.</param>
+        /// <returns>A list of aisle-product entries for the specified aisle.</returns>
         [HttpPost("aisleProducts/{aisleId}", Name = "GetAisleProductsByAisleId")]
-        public async Task<IActionResult> GetAisleProductsByAisleId(int aisleId)
+        public async Task<IEnumerable<AisleProduct>> GetAisleProductsByAisleId(int aisleId)
         {
-            var aisleProduct = await _aisleProductService.GetAisleProductsByAisleId(aisleId);
-            if (aisleProduct == null)
-            {
-                return NotFound();
-            }
-            return Ok(aisleProduct);
+            return await _aisleProductService.GetAisleProductsByAisleId(aisleId);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAisleProducts()
+        /// <summary>
+        /// Retrieves all aisle-product entries in the system.
+        /// </summary>
+        /// <returns>A list of all aisle-product entries.</returns>
+        [HttpGet(Name = "GetAisleProducts")]
+        public async Task<IEnumerable<AisleProduct>> GetAisleProducts()
         {
-            var aisleProducts = await _aisleProductService.GetAllAisleProducts();
-            return Ok(aisleProducts);
+            return await _aisleProductService.GetAllAisleProducts();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddAisleProduct(AisleProduct aisleProduct)
+        /// <summary>
+        /// Saves an aisle-product entry. Creates a new entry or updates an existing one.
+        /// </summary>
+        /// <param name="aisleProduct">The aisle-product entry to save.</param>
+        /// <returns>The saved aisle-product entity.</returns>
+        [HttpPost(Name = "SaveAisleProduct")]
+        public async Task<AisleProduct> SaveAisleProduct(AisleProduct aisleProduct)
         {
-            var createdAisleProduct = await _aisleProductService.AddAisleProduct(aisleProduct);
-            return CreatedAtAction(nameof(GetAisleProducts), new { id = createdAisleProduct.Id }, createdAisleProduct);
+            return await _aisleProductService.SaveAisleProduct(aisleProduct);
         }
     }
 }

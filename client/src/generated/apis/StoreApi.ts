@@ -22,12 +22,12 @@ import {
     StoreToJSON,
 } from '../models/index';
 
-export interface ApiStoresPostRequest {
-    store?: Store;
-}
-
 export interface GetStoreByIdRequest {
     storeId: number;
+}
+
+export interface SaveStoreRequest {
+    store?: Store;
 }
 
 /**
@@ -37,56 +37,7 @@ export class StoreApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiStoresGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/stores`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiStoresGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiStoresGetRaw(initOverrides);
-    }
-
-    /**
-     */
-    async apiStoresPostRaw(requestParameters: ApiStoresPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/stores`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: StoreToJSON(requestParameters['store']),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiStoresPost(requestParameters: ApiStoresPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiStoresPostRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async getStoreByIdRaw(requestParameters: GetStoreByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getStoreByIdRaw(requestParameters: GetStoreByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Store>> {
         if (requestParameters['storeId'] == null) {
             throw new runtime.RequiredError(
                 'storeId',
@@ -98,20 +49,82 @@ export class StoreApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/stores/{storeId}`;
+        urlPath = urlPath.replace(`{${"storeId"}}`, encodeURIComponent(String(requestParameters['storeId'])));
+
         const response = await this.request({
-            path: `/api/stores/{storeId}`.replace(`{${"storeId"}}`, encodeURIComponent(String(requestParameters['storeId']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => StoreFromJSON(jsonValue));
     }
 
     /**
      */
-    async getStoreById(requestParameters: GetStoreByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getStoreByIdRaw(requestParameters, initOverrides);
+    async getStoreById(requestParameters: GetStoreByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Store> {
+        const response = await this.getStoreByIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getStoresRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Store>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/stores`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(StoreFromJSON));
+    }
+
+    /**
+     */
+    async getStores(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Store>> {
+        const response = await this.getStoresRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async saveStoreRaw(requestParameters: SaveStoreRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Store>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/stores`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: StoreToJSON(requestParameters['store']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => StoreFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async saveStore(requestParameters: SaveStoreRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Store> {
+        const response = await this.saveStoreRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

@@ -34,8 +34,11 @@ export class WeatherForecastApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/WeatherForecast`;
+
         const response = await this.request({
-            path: `/WeatherForecast`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

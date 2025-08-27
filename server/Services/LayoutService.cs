@@ -32,9 +32,30 @@ namespace GroceryGetter.Services
             return await _context.Layout.ToListAsync();
         }
 
-        public async Task<Layout> AddLayout(Layout layout)
+        public async Task<Layout> SaveLayout(Layout layout)
         {
-            _context.Layout.Add(layout);
+            var duplicate = await _context.Layout
+                .Where(l => l.StoreId == layout.StoreId && l.Name == layout.Name && l.Id != layout.Id)
+                .FirstOrDefaultAsync();
+
+            if (duplicate != null)
+            {
+                throw new InvalidOperationException("A layout with this name already exists for the store.");
+            }
+
+            if (layout.Id > 0)
+            {
+                var existingLayout = await _context.Layout.FindAsync(layout.Id);
+                if (existingLayout != null)
+                {
+                    _context.Entry(existingLayout).CurrentValues.SetValues(layout);
+                }
+            }
+            else
+            {
+                _context.Layout.Add(layout);
+            }
+
             await _context.SaveChangesAsync();
             return layout;
         }

@@ -10,41 +10,59 @@ namespace GroceryGetter.Controllers
     {
         private readonly ILayoutService _layoutService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LayoutController"/> class.
+        /// </summary>
+        /// <param name="layoutService">Service for layout operations.</param>
         public LayoutController(ILayoutService layoutService)
         {
             _layoutService = layoutService;
         }
 
+        /// <summary>
+        /// Retrieves a layout by its unique identifier.
+        /// </summary>
+        /// <param name="layoutId">The ID of the layout to retrieve.</param>
+        /// <returns>The layout if found; otherwise, null.</returns>
         [HttpGet("{layoutId}", Name = "GetLayoutById")]
-        public async Task<IActionResult> GetLayout(int layoutId)
+        public async Task<Layout?> GetLayout(int layoutId)
         {
-            var layout = await _layoutService.GetLayoutById(layoutId);
-            if (layout == null)
-            {
-                return NotFound();
-            }
-            return Ok(layout);
+            return await _layoutService.GetLayoutById(layoutId);
         }
 
+        /// <summary>
+        /// Retrieves all layouts associated with a specific store.
+        /// </summary>
+        /// <param name="storeId">The ID of the store.</param>
+        /// <returns>A list of layouts for the specified store.</returns>
         [HttpPost("{storeId}", Name = "GetLayoutsByStoreId")]
-        public async Task<IActionResult> GetLayoutsByStoreId(int storeId)
+        public async Task<IEnumerable<Layout>> GetLayoutsByStoreId(int storeId)
         {
-            var layouts = await _layoutService.GetLayoutsByStoreId(storeId);
-            return Ok(layouts);
+            return await _layoutService.GetLayoutsByStoreId(storeId);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetLayouts()
+        /// <summary>
+        /// Retrieves all layouts in the system.
+        /// </summary>
+        /// <returns>A list of all layouts.</returns>
+        [HttpGet(Name = "GetLayouts")]
+        public async Task<IEnumerable<Layout>> GetLayouts()
         {
-            var layouts = await _layoutService.GetAllLayouts();
-            return Ok(layouts);
+            return await _layoutService.GetAllLayouts();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddLayout(Layout layout)
+        /// <summary>
+        /// Saves a layout. Creates a new layout or updates an existing one.
+        /// </summary>
+        /// <param name="layout">The layout to save.</param>
+        /// <returns>The saved layout entity.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if a layout with the same name already exists for the store.
+        /// </exception>
+        [HttpPost(Name = "SaveLayout")]
+        public async Task<Layout> SaveLayout(Layout layout)
         {
-            var createdLayout = await _layoutService.AddLayout(layout);
-            return CreatedAtAction(nameof(GetLayouts), new { id = createdLayout.Id }, createdLayout);
+            return await _layoutService.SaveLayout(layout);
         }
     }
 }

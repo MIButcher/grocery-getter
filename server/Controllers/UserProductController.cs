@@ -1,7 +1,7 @@
 using GroceryGetter.Models;
 using GroceryGetter.DomainServices;
 using Microsoft.AspNetCore.Mvc;
-using NpgsqlTypes;
+using GroceryGetter.DomainServices.Models;
 
 namespace GroceryGetter.Controllers
 {
@@ -16,47 +16,167 @@ namespace GroceryGetter.Controllers
             _userProductService = userProductService;
         }
 
-        [HttpGet("{userProductId}", Name = "GetUserProductById")]
-        public async Task<IActionResult> GetUserProduct(int userProductId)
+        /// <summary>
+        /// Retrieves a specific UserProduct by its Id.
+        /// </summary>
+        /// <param name="userProductId">The Id of the UserProduct.</param>
+        /// <returns>The UserProduct object.</returns>
+        [HttpGet("userProduct/{userProductId}", Name = "GetUserProductById")]
+        public async Task<UserProduct> GetUserProduct(int userProductId)
         {
-            var userProduct = await _userProductService.GetUserProductById(userProductId);
-            if (userProduct == null)
-            {
-                return NotFound();
-            }
-            return Ok(userProduct);
+            return await _userProductService.GetUserProductById(userProductId);
         }
 
-        [HttpPost("userProduct/{productId}", Name = "GetUserProductByProductId")]
-        public async Task<IActionResult> GetUserProductByProductId(int productId)
+        /// <summary>
+        /// Retrieves a specific UserProduct by its Id.
+        /// </summary>
+        /// <param name="userProductId">The Id of the UserProduct.</param>
+        /// <returns>The UserProduct converted to a GroceryListItem object.</returns>
+        [HttpGet("groceryListItem/{userProductId}", Name = "GetGroceryListItemById")]
+        public async Task<GroceryListItem> GetGroceryListItemById(int userProductId)
         {
-            var userProduct = await _userProductService.GetUserProductByProductId(productId);
-            if (userProduct == null)
-            {
-                return NotFound();
-            }
-            return Ok(userProduct);
+            return await _userProductService.GetGroceryListItemById(userProductId);
         }
 
-        [HttpPost("userProducts/{userId}", Name = "GetUserProductsByUserId")]
-        public async Task<IActionResult> GetUserProductsByUserId(int userId)
+        /// <summary>
+        /// Retrieves a specific UserProduct by the Product Id.
+        /// </summary>
+        /// <param name="productId">The Id of the Product.</param>
+        /// <returns>The UserProduct object.</returns>
+        [HttpPost("userProduct/product/{productId}", Name = "GetUserProductByProductId")]
+        public async Task<UserProduct> GetUserProductByProductId(int productId)
         {
-            var userProducts = await _userProductService.GetUserProductsByUserId(userId);
-            return Ok(userProducts);
+            return await _userProductService.GetUserProductByProductId(productId);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetUserProducts()
+        /// <summary>
+        /// Retrieves a specific UserProduct by the Product Id.
+        /// </summary>
+        /// <param name="productId">The Id of the Product.</param>
+        /// <returns>The UserProduct converted to a GroceryListItem object.</returns>
+        [HttpPost("groceryListItem/product/{productId}", Name = "GetGroceryListItemByProductId")]
+        public async Task<GroceryListItem> GetGroceryListItemByProductId(int productId)
         {
-            var userProducts = await _userProductService.GetAllUserProducts();
-            return Ok(userProducts);
+            return await _userProductService.GetGroceryListItemByProductId(productId);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddUserProduct(UserProduct userProduct)
+        /// <summary>
+        /// Retrieves a list of all UserProducts by the User Id.
+        /// </summary>
+        /// <param name="userId">The Id of the User.</param>
+        /// <returns>A list of UserProduct objects.</returns>
+        [HttpPost("userProducts/user/{userId}", Name = "GetUserProductsByUserId")]
+        public async Task<IEnumerable<UserProduct>> GetUserProductsByUserId(int userId)
         {
-            var createdUserProduct = await _userProductService.AddUserProduct(userProduct);
-            return CreatedAtAction(nameof(GetUserProducts), new { id = createdUserProduct.Id }, createdUserProduct);
+            return await _userProductService.GetUserProductsByUserId(userId);
+        }
+
+        /// <summary>
+        /// Retrieves a list of all UserProducts by the User Id.
+        /// </summary>
+        /// <param name="userId">The Id of the User.</param>
+        /// <returns>A list of UserProducts converted to GroceryListItem objects.</returns>
+        [HttpPost("groceryListItems/user/{userId}", Name = "GetGroceryListItemsByUserId")]
+        public async Task<IEnumerable<GroceryListItem>> GetGroceryListItemsByUserId(int userId)
+        {
+            return await _userProductService.GetGroceryListItemsByUserId(userId);
+        }
+
+        /// <summary>
+        /// Retrieves a list of all UserProducts in the database (Likely for Admin use only).
+        /// </summary>
+        /// <returns>A list of UserProduct objects.</returns>
+        [HttpGet("userProducts", Name = "GetUserProducts")]
+        public async Task<IEnumerable<UserProduct>> GetUserProducts()
+        {
+            return await _userProductService.GetAllUserProducts();
+        }
+
+        /// <summary>
+        /// Retrieves all data needed to insert a new Product, associated AisleProducts and UserProduct.
+        /// </summary>
+        /// <returns>A list of Stores, active Layouts associated with the Stores, and Aisles associated with the Layouts.</returns>
+        [HttpGet("storeLayoutAisleData", Name = "GetAddNewUserProductData")]
+        public async Task<StoreLayoutAisleData> GetAddNewUserProductData()
+        {
+            return await _userProductService.GetAddNewUserProductData();
+        }
+
+        /// <summary>
+        /// Creates a new UserProduct or updates an existing UserProduct.
+        /// </summary>
+        /// <param name="userProduct">The UserProduct in need of saving.</param>
+        /// <returns>The new or updated UserProduct object.</returns>
+        [HttpPost("userProduct/save", Name = "SaveUserProduct")]
+        public async Task<UserProduct> SaveUserProduct(UserProduct userProduct)
+        {
+            return await _userProductService.SaveUserProduct(userProduct);
+        }
+
+        /// <summary>
+        /// Saves changes to a UserProduct's InCart, Quantity and Notes properties.
+        /// </summary>
+        /// <param name="groceryListItem">The GroceryListItem in need of saving.</param>
+        /// <returns>True or false.</returns>
+        [HttpPost("groceryListItem", Name = "SaveGroceryListItem")]
+        public async Task<bool> SaveGroceryListItem(GroceryListItem groceryListItem)
+        {
+            return await _userProductService.SaveGroceryListItem(groceryListItem);
+        }
+
+        /// <summary>
+        /// Creates new UserProducts.
+        /// </summary>
+        /// <param name="userProductsCriteria">The current UserId, StoreId (if selected) and list of Product.Name.</param>
+        /// <returns>A list of UserProducts converted to GroceryListItem objects.</returns>
+        [HttpPost("userProducts/add", Name = "AddUserProducts")]
+        public async Task<AddUserProductsResult> AddUserProducts(UserProductsCriteria userProductsCriteria)
+        {
+            return await _userProductService.AddUserProducts(userProductsCriteria);
+        }
+
+        /// <summary>
+        /// Merges UserProducts from a shared list to the user's list.
+        /// </summary>
+        /// <param name="userProductsMergeCriteria">The current UserId, StoreId (if selected) and list of Products.</param>
+        /// <returns>A list of UserProducts converted to GroceryListItem objects.</returns>
+        [HttpPost("userProducts/merge", Name = "MergeUserProducts")]
+        public async Task<List<GroceryListItem>> MergeUserProducts(UserProductsMergeCriteria userProductsMergeCriteria)
+        {
+            return await _userProductService.MergeUserProducts(userProductsMergeCriteria);
+        }
+
+        /// <summary>
+        /// Inserts a new Product, associated AisleProducts (always an Alphabetical AisleProduct) and UserProduct.
+        /// </summary>
+        /// <param name="fullUserProductRequest">The current UserId, StoreId and Product and Aisle information.</param>
+        /// <returns>AddUserProductsResult: A comma delimited list of unhandled Product names and a list of User Products converted to GroceryListItem objects.</returns>
+        [HttpPost("userProduct/add", Name = "AddUserProduct")]
+        public async Task<AddUserProductsResult> AddFullNewUserProduct(FullUserProductRequest fullUserProductRequest)
+        {
+            return await _userProductService.AddFullNewUserProduct(fullUserProductRequest);
+        }
+
+        /// <summary>
+        /// Deletes a UserProduct by its Id.
+        /// </summary>
+        /// <param name="userProductId">The Id of the UserProduct.</param>
+        /// <returns></returns>
+        [HttpDelete("userProduct/delete/{userProductId}", Name = "DeleteUserProduct")]
+        public async Task DeleteUserProduct(int userProductId)
+        {
+            await _userProductService.DeleteUserProduct(userProductId);
+        }
+
+        /// <summary>
+        /// Deletes all UserProducts linked to the User's Id.
+        /// </summary>
+        /// <param name="userId">The Id of the User.</param>
+        /// <returns></returns>
+        [HttpDelete("userProducts/deleteList/{userId}", Name = "DeleteGroceryList")]
+        public async Task DeleteGroceryList(int userId)
+        {
+            await _userProductService.DeleteGroceryList(userId);
         }
     }
 }

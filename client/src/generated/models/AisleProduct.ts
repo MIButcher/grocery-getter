@@ -13,6 +13,21 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Aisle } from './Aisle';
+import {
+    AisleFromJSON,
+    AisleFromJSONTyped,
+    AisleToJSON,
+    AisleToJSONTyped,
+} from './Aisle';
+import type { Product } from './Product';
+import {
+    ProductFromJSON,
+    ProductFromJSONTyped,
+    ProductToJSON,
+    ProductToJSONTyped,
+} from './Product';
+
 /**
  * 
  * @export
@@ -37,6 +52,24 @@ export interface AisleProduct {
      * @memberof AisleProduct
      */
     aisleId?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AisleProduct
+     */
+    isVerified?: boolean;
+    /**
+     * 
+     * @type {Product}
+     * @memberof AisleProduct
+     */
+    product?: Product;
+    /**
+     * 
+     * @type {Aisle}
+     * @memberof AisleProduct
+     */
+    aisle?: Aisle;
 }
 
 /**
@@ -59,6 +92,9 @@ export function AisleProductFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'id': json['id'] == null ? undefined : json['id'],
         'productId': json['productId'] == null ? undefined : json['productId'],
         'aisleId': json['aisleId'] == null ? undefined : json['aisleId'],
+        'isVerified': json['isVerified'] == null ? undefined : json['isVerified'],
+        'product': json['product'] == null ? undefined : ProductFromJSON(json['product']),
+        'aisle': json['aisle'] == null ? undefined : AisleFromJSON(json['aisle']),
     };
 }
 
@@ -76,6 +112,9 @@ export function AisleProductToJSONTyped(value?: AisleProduct | null, ignoreDiscr
         'id': value['id'],
         'productId': value['productId'],
         'aisleId': value['aisleId'],
+        'isVerified': value['isVerified'],
+        'product': ProductToJSON(value['product']),
+        'aisle': AisleToJSON(value['aisle']),
     };
 }
 

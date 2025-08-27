@@ -49,6 +49,18 @@ export interface User {
      * @memberof User
      */
     password?: string | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof User
+     */
+    isAdmin?: boolean;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof User
+     */
+    sharedListUserIds?: Array<number> | null;
 }
 
 /**
@@ -73,6 +85,8 @@ export function UserFromJSONTyped(json: any, ignoreDiscriminator: boolean): User
         'lastName': json['lastName'] == null ? undefined : json['lastName'],
         'email': json['email'] == null ? undefined : json['email'],
         'password': json['password'] == null ? undefined : json['password'],
+        'isAdmin': json['isAdmin'] == null ? undefined : json['isAdmin'],
+        'sharedListUserIds': json['sharedListUserIds'] == null ? undefined : json['sharedListUserIds'],
     };
 }
 
@@ -92,6 +106,8 @@ export function UserToJSONTyped(value?: User | null, ignoreDiscriminator: boolea
         'lastName': value['lastName'],
         'email': value['email'],
         'password': value['password'],
+        'isAdmin': value['isAdmin'],
+        'sharedListUserIds': value['sharedListUserIds'],
     };
 }
 

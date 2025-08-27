@@ -21,7 +21,24 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Converts classes with CSS to modules. */
-    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+    "plugins": [{ "name": "typescript-plugin-css-modules" }],
+
+    /* Path aliases */
+    "baseUrl": "src",
+    "paths": {
+      "@components/*": ["components/*"],
+      "@config/*": ["config/*"],
+      "@context/*": ["context/*"],
+      "@css/*": ["css/*"],
+      "@generated/*": ["generated/*"],
+      "@models/*": ["generated/models/*"],
+      "@apis/*": ["generated/apis/*"],
+      "@hooks/*": ["hooks/*"],
+      "@imports/*": ["imports/*"],
+      "@pages/*": ["pages/*"],
+      "@themes/*": ["themes/*"],
+      "@utilities/*": ["utilities/*"],
+    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

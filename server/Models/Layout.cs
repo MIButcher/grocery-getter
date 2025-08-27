@@ -5,5 +5,7 @@ namespace GroceryGetter.Models
         public int Id { get; set; }
         public int StoreId { get; set; }
         public string Name { get; set; }
+        public bool IsActive { get; set; }
+        public Store Store { get; set; }
     }
 }

@@ -40,10 +40,58 @@ export const defaultTheme: IThemeConfiguration = {
           },
         ],
       },
+      MuiMenu: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: '#F9F9F9',
+          },
+          list: {
+            backgroundColor: '#F9F9F9',
+          },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#F9F9F9',
+            '&.Mui-selected': {
+              backgroundColor: '#D3D3D3',
+              color: '#000000',
+            },
+            '&:hover': {
+              backgroundColor: '#D3D3D3',
+            },
+          },
+        },
+      },
+      MuiSvgIcon: {
+        styleOverrides: {
+          root: {
+            fontSize: '24px',
+            color: '#365173',
+          },
+        },
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            // Applies to the Dialog's Paper container
+            backgroundColor: '#F9F9F9',
+            borderRadius: 12,
+            padding: '24px',
+            maxWidth: '600px',
+            width: '100%',
+          },
+          root: {
+            // Applies to the outermost Dialog wrapper
+            backdropFilter: 'blur(4px)',
+          },
+        },
+      },
     },
   },
   cssVariables: {
-    '--table-background-color': '#FFFFFF',
-    '--table-head-background-color': '#F1F1F1'
+    '--table-background-color': '#F9F9F9',
+    '--table-head-background-color': '#D3D3D3'
   }
 };

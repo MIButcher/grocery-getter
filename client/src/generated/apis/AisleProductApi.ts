@@ -22,10 +22,6 @@ import {
     AisleProductToJSON,
 } from '../models/index';
 
-export interface ApiAisleProductsPostRequest {
-    aisleProduct?: AisleProduct;
-}
-
 export interface GetAisleProductByIdRequest {
     aisleProductId: number;
 }
@@ -38,6 +34,10 @@ export interface GetAisleProductsByAisleIdRequest {
     aisleId: number;
 }
 
+export interface SaveAisleProductRequest {
+    aisleProduct?: AisleProduct;
+}
+
 /**
  * 
  */
@@ -45,56 +45,7 @@ export class AisleProductApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAisleProductsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/aisleProducts`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiAisleProductsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAisleProductsGetRaw(initOverrides);
-    }
-
-    /**
-     */
-    async apiAisleProductsPostRaw(requestParameters: ApiAisleProductsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/aisleProducts`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: AisleProductToJSON(requestParameters['aisleProduct']),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiAisleProductsPost(requestParameters: ApiAisleProductsPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAisleProductsPostRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async getAisleProductByIdRaw(requestParameters: GetAisleProductByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getAisleProductByIdRaw(requestParameters: GetAisleProductByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AisleProduct>> {
         if (requestParameters['aisleProductId'] == null) {
             throw new runtime.RequiredError(
                 'aisleProductId',
@@ -106,25 +57,30 @@ export class AisleProductApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/aisleProducts/{aisleProductId}`;
+        urlPath = urlPath.replace(`{${"aisleProductId"}}`, encodeURIComponent(String(requestParameters['aisleProductId'])));
+
         const response = await this.request({
-            path: `/api/aisleProducts/{aisleProductId}`.replace(`{${"aisleProductId"}}`, encodeURIComponent(String(requestParameters['aisleProductId']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => AisleProductFromJSON(jsonValue));
     }
 
     /**
      */
-    async getAisleProductById(requestParameters: GetAisleProductByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getAisleProductByIdRaw(requestParameters, initOverrides);
+    async getAisleProductById(requestParameters: GetAisleProductByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AisleProduct> {
+        const response = await this.getAisleProductByIdRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      */
-    async getAisleProductByProductIdRaw(requestParameters: GetAisleProductByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getAisleProductByProductIdRaw(requestParameters: GetAisleProductByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AisleProduct>> {
         if (requestParameters['productId'] == null) {
             throw new runtime.RequiredError(
                 'productId',
@@ -136,25 +92,57 @@ export class AisleProductApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/aisleProducts/aisleProduct/{productId}`;
+        urlPath = urlPath.replace(`{${"productId"}}`, encodeURIComponent(String(requestParameters['productId'])));
+
         const response = await this.request({
-            path: `/api/aisleProducts/aisleProduct/{productId}`.replace(`{${"productId"}}`, encodeURIComponent(String(requestParameters['productId']))),
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => AisleProductFromJSON(jsonValue));
     }
 
     /**
      */
-    async getAisleProductByProductId(requestParameters: GetAisleProductByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getAisleProductByProductIdRaw(requestParameters, initOverrides);
+    async getAisleProductByProductId(requestParameters: GetAisleProductByProductIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AisleProduct> {
+        const response = await this.getAisleProductByProductIdRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      */
-    async getAisleProductsByAisleIdRaw(requestParameters: GetAisleProductsByAisleIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getAisleProductsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AisleProduct>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/aisleProducts`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AisleProductFromJSON));
+    }
+
+    /**
+     */
+    async getAisleProducts(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AisleProduct>> {
+        const response = await this.getAisleProductsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getAisleProductsByAisleIdRaw(requestParameters: GetAisleProductsByAisleIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AisleProduct>>> {
         if (requestParameters['aisleId'] == null) {
             throw new runtime.RequiredError(
                 'aisleId',
@@ -166,20 +154,55 @@ export class AisleProductApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/aisleProducts/aisleProducts/{aisleId}`;
+        urlPath = urlPath.replace(`{${"aisleId"}}`, encodeURIComponent(String(requestParameters['aisleId'])));
+
         const response = await this.request({
-            path: `/api/aisleProducts/aisleProducts/{aisleId}`.replace(`{${"aisleId"}}`, encodeURIComponent(String(requestParameters['aisleId']))),
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AisleProductFromJSON));
     }
 
     /**
      */
-    async getAisleProductsByAisleId(requestParameters: GetAisleProductsByAisleIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getAisleProductsByAisleIdRaw(requestParameters, initOverrides);
+    async getAisleProductsByAisleId(requestParameters: GetAisleProductsByAisleIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AisleProduct>> {
+        const response = await this.getAisleProductsByAisleIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async saveAisleProductRaw(requestParameters: SaveAisleProductRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AisleProduct>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/aisleProducts`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AisleProductToJSON(requestParameters['aisleProduct']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AisleProductFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async saveAisleProduct(requestParameters: SaveAisleProductRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AisleProduct> {
+        const response = await this.saveAisleProductRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

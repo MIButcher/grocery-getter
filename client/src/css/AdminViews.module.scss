@@ -11,6 +11,32 @@
             font-size: 2rem;
             color: var(--text-primary);
         }
+
+        .searchBar {
+            margin-top: 0rem;
+
+            fieldset {
+                border: 0px solid transparent;
+            }
+            
+            label {
+                position: fixed;
+                font-size: 2rem;
+                color: var(--text-primary);
+                width: 100%;
+                align-items: center;
+            }
+        }
+
+        .searchBarFocus {
+            margin-top: 0rem;
+            --position: unset;
+
+            label {
+                font-size: 1rem; // Smaller font size when focused
+                color: var(--text-primary);
+            }
+        }
     }
 
     .gridContainer {
@@ -20,6 +46,50 @@
         background-color: var(--table-background-color);
     }
 
+	.form {
+        padding-top: 0.625rem;
+		align-items: center;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 0.625rem;
+
+        .formGroup {
+            display: flex;
+            flex-direction: column;
+
+            label {
+                margin-bottom: 0.313rem;
+            }
+
+            input {
+                padding: 0.625rem;
+                border: 1px solid var(--text-primary);
+                border-radius: 4px;
+                background-color: var(--table-background-color);
+                color: var(--text-primary); // Ensure text color adapts to the theme
+            }
+
+            select {
+                padding: 0.625rem;
+                border: 1px solid var(--text-primary);
+                border-radius: 4px;
+                background-color: var(--table-background-color);
+                color: var(--text-primary); // Ensure text color adapts to the theme
+            }
+        }
+	}
+
+    .suggestionContainer {
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+
+        label {
+            margin-bottom: 0.313rem;
+        }
+    }
+
     .actionsContainer {
         display: flex;
         flex-direction: column;
@@ -27,6 +97,13 @@
         align-items: center;
         height: 6rem;
         margin-top: auto;
+
+        .actions {
+            display: flex;
+            gap: 0.625rem;
+            width: 100%;
+            justify-content: center;
+        }
     }
 
     Button {
