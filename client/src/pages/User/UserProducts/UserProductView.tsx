@@ -207,6 +207,32 @@ const UserProductPage: React.FC = () => {
 		}
 	};
 
+	const handleAddFavorites = async () => {
+		try {
+			const userProductApi = new UserProductApi(
+				new Configuration({ basePath: API_BASE_PATH })
+			);
+			const userId = user?.id || 0;
+
+			const groceryListItems = await userProductApi.addFavoriteUserProducts({ userProductsCriteria: { userId, storeId, productsList: '' } });
+			const data = groceryListItems?.map((groceryListItem: GroceryListItem) => ({
+				...groceryListItem,
+				id: groceryListItem.userProductId,
+			})) ?? [];
+			if (!data.some(item => item.isFavorite)) {
+				toast('You have 0 products favorited.', 'info');
+			}			
+			setGroceryList(data);
+			setSuggestions([]);
+			setTypedList('');
+		} catch (error: any) {
+			console.error('Error adding favorite products:', error);
+			const errorMessage =
+				error.response?.data?.message || 'Failed to add favorite products. Please check your network connection or server status.';
+			toast(errorMessage, 'error');
+		}
+	}
+
 	const handleShareList = async (emailString: string) => {
 		try {
 			const userApi = new UserApi(
@@ -332,6 +358,19 @@ const UserProductPage: React.FC = () => {
 				<div className={styles.actions}>
 					{editMode ?
 						<>
+							<Button
+								variant="outlined"
+								onClick={handleAddFavorites}
+								sx={{
+									backgroundColor: 'transparent',
+									color: 'inherit',
+									'&:hover': {
+										backgroundColor: 'var(--background-container)',
+									},
+								}}
+							>
+								Add Favorites
+							</Button>
 							{user?.sharedListUserIds && user?.sharedListUserIds.length > 0 ?
 								<Button variant="outlined" onClick={() => handleShareList('')}>
 									Unshare List

@@ -22,13 +22,13 @@ namespace GroceryGetter.Controllers
         /// <param name="userProductId">The Id of the UserProduct.</param>
         /// <returns>The UserProduct object.</returns>
         [HttpGet("userProduct/{userProductId}", Name = "GetUserProductById")]
-        public async Task<UserProduct> GetUserProduct(int userProductId)
+        public async Task<UserProduct> GetUserProductById(int userProductId)
         {
             return await _userProductService.GetUserProductById(userProductId);
         }
 
         /// <summary>
-        /// Retrieves a specific UserProduct by its Id.
+        /// Retrieves a specific (non-hidden) UserProduct by its Id.
         /// </summary>
         /// <param name="userProductId">The Id of the UserProduct.</param>
         /// <returns>The UserProduct converted to a GroceryListItem object.</returns>
@@ -39,7 +39,7 @@ namespace GroceryGetter.Controllers
         }
 
         /// <summary>
-        /// Retrieves a specific UserProduct by the Product Id.
+        /// Retrieves a specific (non-hidden) UserProduct by the Product Id.
         /// </summary>
         /// <param name="productId">The Id of the Product.</param>
         /// <returns>The UserProduct object.</returns>
@@ -50,7 +50,7 @@ namespace GroceryGetter.Controllers
         }
 
         /// <summary>
-        /// Retrieves a specific UserProduct by the Product Id.
+        /// Retrieves a specific (non-hidden) UserProduct by the Product Id.
         /// </summary>
         /// <param name="productId">The Id of the Product.</param>
         /// <returns>The UserProduct converted to a GroceryListItem object.</returns>
@@ -72,7 +72,7 @@ namespace GroceryGetter.Controllers
         }
 
         /// <summary>
-        /// Retrieves a list of all UserProducts by the User Id.
+        /// Retrieves a list of all (non-hidden) UserProducts by the User Id.
         /// </summary>
         /// <param name="userId">The Id of the User.</param>
         /// <returns>A list of UserProducts converted to GroceryListItem objects.</returns>
@@ -114,7 +114,7 @@ namespace GroceryGetter.Controllers
         }
 
         /// <summary>
-        /// Saves changes to a UserProduct's InCart, Quantity and Notes properties.
+        /// Saves changes to a UserProduct's InCart, Quantity, Notes and IsFavorite properties.
         /// </summary>
         /// <param name="groceryListItem">The GroceryListItem in need of saving.</param>
         /// <returns>True or false.</returns>
@@ -125,7 +125,7 @@ namespace GroceryGetter.Controllers
         }
 
         /// <summary>
-        /// Creates new UserProducts.
+        /// Creates new (or unhides previously hidden) UserProducts (used to add Products to a User's GroceryListItems).
         /// </summary>
         /// <param name="userProductsCriteria">The current UserId, StoreId (if selected) and list of Product.Name.</param>
         /// <returns>A list of UserProducts converted to GroceryListItem objects.</returns>
@@ -158,7 +158,18 @@ namespace GroceryGetter.Controllers
         }
 
         /// <summary>
-        /// Deletes a UserProduct by its Id.
+        /// Unhides UserProducts where IsFavorite is true.
+        /// </summary>
+        /// <param name="criteria">Criteria including UserId, StoreId ProductsList will not be populated here.</param>
+        /// <returns>A list of UserProducts converted to GroceryListItem objects.</returns>
+        [HttpPost("userProduct/addFavorites", Name = "AddFavoriteUserProducts")]
+        public async Task<List<GroceryListItem>> AddFavoriteUserProducts(UserProductsCriteria criteria)
+        {
+            return await _userProductService.AddFavoriteUserProducts(criteria);
+        }
+
+        /// <summary>
+        /// Deletes (or hides if IsFavorite) a UserProduct by its Id.
         /// </summary>
         /// <param name="userProductId">The Id of the UserProduct.</param>
         /// <returns></returns>
@@ -169,7 +180,7 @@ namespace GroceryGetter.Controllers
         }
 
         /// <summary>
-        /// Deletes all UserProducts linked to the User's Id.
+        /// Deletes (or hides if IsFavorite) all UserProducts linked to the User's Id.
         /// </summary>
         /// <param name="userId">The Id of the User.</param>
         /// <returns></returns>

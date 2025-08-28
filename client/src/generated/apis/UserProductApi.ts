@@ -40,6 +40,10 @@ import {
     UserProductsMergeCriteriaToJSON,
 } from '../models/index';
 
+export interface AddFavoriteUserProductsRequest {
+    userProductsCriteria?: UserProductsCriteria;
+}
+
 export interface AddUserProductRequest {
     fullUserProductRequest?: FullUserProductRequest;
 }
@@ -96,6 +100,36 @@ export interface SaveUserProductRequest {
  * 
  */
 export class UserProductApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async addFavoriteUserProductsRaw(requestParameters: AddFavoriteUserProductsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<GroceryListItem>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/api/userProducts/userProduct/addFavorites`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserProductsCriteriaToJSON(requestParameters['userProductsCriteria']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(GroceryListItemFromJSON));
+    }
+
+    /**
+     */
+    async addFavoriteUserProducts(requestParameters: AddFavoriteUserProductsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<GroceryListItem>> {
+        const response = await this.addFavoriteUserProductsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */

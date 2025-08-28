@@ -77,6 +77,15 @@ const UserProductDetails: React.FC = () => {
                             In Cart
                         </label>
                     </div>
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="isFavorite"
+                            checked={groceryListItem?.isFavorite}
+                            onChange={(e) => setGroceryListItem({ ...groceryListItem, isFavorite: e.target.checked })}
+                        />
+                        Is Favorite
+                    </label>
                 </div>
             </form>
             <div className={styles.actionsContainer}>

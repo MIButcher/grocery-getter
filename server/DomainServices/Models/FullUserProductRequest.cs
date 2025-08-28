@@ -10,5 +10,7 @@
         public int[] AisleIds { get; set; } = Array.Empty<int>();
         public bool InCart { get; set; } = false;
         public bool IsVerified { get; set; } = false;
+        public bool IsFavorite { get; set; } = false;
+        public bool IsHidden { get; set; } = false;
     }
 }

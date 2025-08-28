@@ -150,6 +150,15 @@ const AddUserProductView: React.FC = () => {
                             In Cart
                         </label>
                     </div>
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="isFavorite"
+                            checked={fullUserProduct?.isFavorite}
+                            onChange={(e) => setFullUserProduct({ ...fullUserProduct, isFavorite: e.target.checked })}
+                        />
+                        Is Favorite
+                    </label>
                 </div>
                 <div className={styles.formGroup}>
                     <FormControl className={styles.dropDownMenu} style={{marginTop: '0.5rem'}} fullWidth>

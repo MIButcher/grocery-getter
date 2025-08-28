@@ -61,6 +61,18 @@ export interface GroceryListItem {
      * @memberof GroceryListItem
      */
     inCart?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof GroceryListItem
+     */
+    isFavorite?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof GroceryListItem
+     */
+    isHidden?: boolean;
 }
 
 /**
@@ -87,6 +99,8 @@ export function GroceryListItemFromJSONTyped(json: any, ignoreDiscriminator: boo
         'quantity': json['quantity'] == null ? undefined : json['quantity'],
         'notes': json['notes'] == null ? undefined : json['notes'],
         'inCart': json['inCart'] == null ? undefined : json['inCart'],
+        'isFavorite': json['isFavorite'] == null ? undefined : json['isFavorite'],
+        'isHidden': json['isHidden'] == null ? undefined : json['isHidden'],
     };
 }
 
@@ -108,6 +122,8 @@ export function GroceryListItemToJSONTyped(value?: GroceryListItem | null, ignor
         'quantity': value['quantity'],
         'notes': value['notes'],
         'inCart': value['inCart'],
+        'isFavorite': value['isFavorite'],
+        'isHidden': value['isHidden'],
     };
 }
 

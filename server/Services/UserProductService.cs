@@ -25,7 +25,7 @@ namespace GroceryGetter.Services
         {
             return await _context.UserProduct
                 .Include(up => up.Product)
-                .Where(up => up.Id == userProductId)
+                .Where(up => up.Id == userProductId && !up.IsHidden)
                 .Select(up => new GroceryListItem
                 {
                     UserProductId = up.Id,
@@ -39,7 +39,7 @@ namespace GroceryGetter.Services
         public async Task<UserProduct?> GetUserProductByProductId(int productId)
         {
             return await _context.UserProduct
-                .Where(up => up.ProductId == productId)
+                .Where(up => up.ProductId == productId && !up.IsHidden)
                 .FirstOrDefaultAsync();
         }
 
@@ -47,7 +47,7 @@ namespace GroceryGetter.Services
         {
             return await _context.UserProduct
                 .Include(up => up.Product)
-                .Where(up => up.ProductId == productId)
+                .Where(up => up.ProductId == productId && !up.IsHidden)
                 .Select(up => new GroceryListItem
                 {
                     UserProductId = up.Id,
@@ -70,9 +70,10 @@ namespace GroceryGetter.Services
             var sql = "SELECT * FROM get_grocery_list_items(@p_user_id, @p_store_id);";
             var userIdParam = new NpgsqlParameter("p_user_id", userId);
             var storeIdParam = new NpgsqlParameter("p_store_id", 1);
-            return await _context.GroceryListItem
+            var results = await _context.GroceryListItem
                 .FromSqlRaw(sql, userIdParam, storeIdParam)
                 .ToListAsync();
+            return results.FindAll(r => !r.IsHidden);
         }
 
         public async Task<List<UserProduct>> GetAllUserProducts()
@@ -133,6 +134,7 @@ namespace GroceryGetter.Services
                     existingUserProduct.InCart = groceryListItem.InCart;
                     existingUserProduct.Quantity = groceryListItem.Quantity;
                     existingUserProduct.Notes = groceryListItem.Notes;
+                    existingUserProduct.IsFavorite = groceryListItem.IsFavorite;
 
                     await _context.SaveChangesAsync();
                     return true;
@@ -144,8 +146,13 @@ namespace GroceryGetter.Services
         public async Task<AddUserProductsResult> AddUserProducts(UserProductsCriteria userProductsCriteria)
         {
             string unhandledProducts = "";
-            if (userProductsCriteria.ProductsList != string.Empty)
+            if (!string.IsNullOrWhiteSpace(userProductsCriteria.ProductsList))
             {
+                var hiddenUserProducts = await _context.UserProduct
+                    .Where(up => up.IsHidden)
+                    .ToListAsync();
+                var hiddenIds = hiddenUserProducts.Select(h => h.ProductId).ToList();
+
                 var productNames = userProductsCriteria.ProductsList.Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(item => item.Trim().ToLower()) // Removes spaces, tabs, newlines
                     .Where(item => !string.IsNullOrWhiteSpace(item)) // Optional: skip empty results
@@ -157,14 +164,22 @@ namespace GroceryGetter.Services
 
                 foreach (var product in products)
                 {
-                    var userProduct = new UserProduct()
+                    if (hiddenIds.Contains(product.Id))
                     {
-                        UserId = userProductsCriteria.UserId,
-                        ProductId = product.Id,
-                        InCart = false,
-                        Quantity = 1,
-                    };
-                    _context.UserProduct.Add(userProduct);
+                        var hiddenUserProduct = hiddenUserProducts.Find(h => h.ProductId ==  product.Id);
+                        hiddenUserProduct.IsHidden = false;
+                    }
+                    else
+                    {
+                        var userProduct = new UserProduct()
+                        {
+                            UserId = userProductsCriteria.UserId,
+                            ProductId = product.Id,
+                            InCart = false,
+                            Quantity = 1,
+                        };
+                        _context.UserProduct.Add(userProduct);
+                    }
                     productNames.Remove(product.Name.ToLower());
                 }
 
@@ -179,7 +194,7 @@ namespace GroceryGetter.Services
                 .FromSqlRaw(sql, userIdParam, storeIdParam)
                 .ToListAsync();
 
-            return new AddUserProductsResult() { UnhandledProductsList = unhandledProducts, GroceryListItems = results};
+            return new AddUserProductsResult() { UnhandledProductsList = unhandledProducts, GroceryListItems = results.FindAll(r => !r.IsHidden) };
         }
 
         public async Task<List<GroceryListItem>> MergeUserProducts(UserProductsMergeCriteria userProductsMergeCriteria)
@@ -187,6 +202,7 @@ namespace GroceryGetter.Services
             if (userProductsMergeCriteria.GroceryListItems.Count() > 0)
             {
                 var userProductIds = userProductsMergeCriteria.GroceryListItems
+                    .Where(item => !item.IsHidden)
                     .Select(item => item.UserProductId)
                     .ToList();
 
@@ -213,9 +229,10 @@ namespace GroceryGetter.Services
             var sql = "SELECT * FROM get_grocery_list_items(@p_user_id, @p_store_id);";
             var userIdParam = new NpgsqlParameter("p_user_id", userProductsMergeCriteria.UserId);
             var storeIdParam = new NpgsqlParameter("p_store_id", userProductsMergeCriteria.StoreId ?? 1);
-            return await _context.GroceryListItem
+            var results = await _context.GroceryListItem
                 .FromSqlRaw(sql, userIdParam, storeIdParam)
                 .ToListAsync();
+            return results.FindAll(r => !r.IsHidden);
         }
 
         public async Task<AddUserProductsResult> AddFullNewUserProduct(FullUserProductRequest request)
@@ -250,7 +267,8 @@ namespace GroceryGetter.Services
                 ProductId = product.Id,
                 Quantity = request.Quantity,
                 Notes = request.Notes,
-                InCart = request.InCart
+                InCart = request.InCart,
+                IsFavorite = request.IsFavorite,
             };
             _context.UserProduct.Add(userProduct);
 
@@ -267,8 +285,25 @@ namespace GroceryGetter.Services
             return new AddUserProductsResult
             {
                 UnhandledProductsList = "",
-                GroceryListItems = results
+                GroceryListItems = results.FindAll(r => !r.IsHidden)
             };
+        }
+
+        public async Task<List<GroceryListItem>> AddFavoriteUserProducts(UserProductsCriteria criteria)
+        {
+            var hiddenUserProducts = await _context.UserProduct
+                .Where(up => criteria.UserId == up.UserId && up.IsHidden)
+                .ToListAsync();
+
+            hiddenUserProducts.ForEach(h => h.IsHidden = false);
+            await _context.SaveChangesAsync();
+            var sql = "SELECT * FROM get_grocery_list_items(@p_user_id, @p_store_id);";
+            var userIdParam = new NpgsqlParameter("p_user_id", criteria.UserId);
+            var storeIdParam = new NpgsqlParameter("p_store_id", criteria.StoreId ?? 1);
+            var results = await _context.GroceryListItem
+                    .FromSqlRaw(sql, userIdParam, storeIdParam)
+                    .ToListAsync();
+            return results.FindAll(r => !r.IsHidden);
         }
 
         public async Task DeleteUserProduct(int userProductId)
@@ -279,8 +314,16 @@ namespace GroceryGetter.Services
 
             if (userProduct != null)
             {
-                _context.Remove(userProduct);
-                await _context.SaveChangesAsync();
+                if (userProduct.IsFavorite)
+                {
+                    userProduct.IsHidden = true;
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    _context.Remove(userProduct);
+                    await _context.SaveChangesAsync();
+                }
             }
         }
 
@@ -290,11 +333,25 @@ namespace GroceryGetter.Services
                 .Where(up => up.UserId == userId)
                 .ToListAsync();
 
-            if (userProducts.Any())
+            if (userProducts.Count == 0) return;
+
+            var toDelete = new List<UserProduct>();
+            var toHide = new List<UserProduct>();
+
+            foreach (var product in userProducts)
             {
-                _context.RemoveRange(userProducts);
-                await _context.SaveChangesAsync();
+                if (product.IsFavorite)
+                    product.IsHidden = true;
+                else
+                    toDelete.Add(product);
             }
+
+            if (toDelete.Count > 0)
+            {
+                _context.RemoveRange(toDelete);
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

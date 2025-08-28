@@ -67,6 +67,18 @@ export interface FullUserProductRequest {
      * @memberof FullUserProductRequest
      */
     isVerified?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof FullUserProductRequest
+     */
+    isFavorite?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof FullUserProductRequest
+     */
+    isHidden?: boolean;
 }
 
 /**
@@ -94,6 +106,8 @@ export function FullUserProductRequestFromJSONTyped(json: any, ignoreDiscriminat
         'aisleIds': json['aisleIds'] == null ? undefined : json['aisleIds'],
         'inCart': json['inCart'] == null ? undefined : json['inCart'],
         'isVerified': json['isVerified'] == null ? undefined : json['isVerified'],
+        'isFavorite': json['isFavorite'] == null ? undefined : json['isFavorite'],
+        'isHidden': json['isHidden'] == null ? undefined : json['isHidden'],
     };
 }
 
@@ -116,6 +130,8 @@ export function FullUserProductRequestToJSONTyped(value?: FullUserProductRequest
         'aisleIds': value['aisleIds'],
         'inCart': value['inCart'],
         'isVerified': value['isVerified'],
+        'isFavorite': value['isFavorite'],
+        'isHidden': value['isHidden'],
     };
 }
 

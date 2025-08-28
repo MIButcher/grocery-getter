@@ -8,6 +8,8 @@ namespace GroceryGetter.Models
         public bool InCart { get; set; }
         public int Quantity { get; set; }
         public string? Notes { get; set; }
+        public bool IsFavorite { get; set; }
+        public bool IsHidden { get; set; }
         public User User { get; set; }
         public Product Product { get; set; }
     }

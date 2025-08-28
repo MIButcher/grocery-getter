@@ -72,6 +72,18 @@ export interface UserProduct {
     notes?: string | null;
     /**
      * 
+     * @type {boolean}
+     * @memberof UserProduct
+     */
+    isFavorite?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserProduct
+     */
+    isHidden?: boolean;
+    /**
+     * 
      * @type {User}
      * @memberof UserProduct
      */
@@ -107,6 +119,8 @@ export function UserProductFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'inCart': json['inCart'] == null ? undefined : json['inCart'],
         'quantity': json['quantity'] == null ? undefined : json['quantity'],
         'notes': json['notes'] == null ? undefined : json['notes'],
+        'isFavorite': json['isFavorite'] == null ? undefined : json['isFavorite'],
+        'isHidden': json['isHidden'] == null ? undefined : json['isHidden'],
         'user': json['user'] == null ? undefined : UserFromJSON(json['user']),
         'product': json['product'] == null ? undefined : ProductFromJSON(json['product']),
     };
@@ -129,6 +143,8 @@ export function UserProductToJSONTyped(value?: UserProduct | null, ignoreDiscrim
         'inCart': value['inCart'],
         'quantity': value['quantity'],
         'notes': value['notes'],
+        'isFavorite': value['isFavorite'],
+        'isHidden': value['isHidden'],
         'user': UserToJSON(value['user']),
         'product': ProductToJSON(value['product']),
     };

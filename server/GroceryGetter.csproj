@@ -17,6 +17,7 @@
     <EmbeddedResource Include="Database\Scripts\Mig202508211644\AddGetGroceryListItemsSP.sql" />
     <EmbeddedResource Include="Database\Scripts\Mig202508211900\AddMoreAisleProductData.sql" />
     <EmbeddedResource Include="Database\Scripts\Mig202508211940\AddAldiAisleProductData.sql" />
+    <EmbeddedResource Include="Database\Scripts\Mig202508271705\UpdateGetGroceryListItemsSP.sql" />
     <EmbeddedResource Include="Database\Scripts\Mig202508212107\UpdateGetGroceryListItemsSP.sql" />
     <EmbeddedResource Include="Database\Scripts\Mig202508212218\AddAlphabeticalData.sql" />
   </ItemGroup>
