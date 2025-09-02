@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: server
+    rootDir: server
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: DefaultConnection
+        value: postgresql://production:fW61hU6JlnTSCLY8vZp7wmLwUPpiyabz@dpg-d2rj2v8gjchc73ak7s0g-a/grocerygetterdb
+      - key: PostgreSqlConnection
+        value: postgresql://production:fW61hU6JlnTSCLY8vZp7wmLwUPpiyabz@dpg-d2rj2v8gjchc73ak7s0g-a/grocerygetterdb
