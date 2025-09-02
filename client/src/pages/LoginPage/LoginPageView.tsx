@@ -74,6 +74,17 @@ const LoginPage: React.FC = () => {
                         />
                     </div>
                     <Button type="submit" className="login-button">Login</Button>
+                    <div className="register-link">
+                        <p>
+                            Don't have an account?{' '}
+                            <span
+                            className="register-text"
+                            onClick={() => navigate('/register')}
+                            >
+                            Register here
+                            </span>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>

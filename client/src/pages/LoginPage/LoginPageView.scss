@@ -62,3 +62,18 @@
 .login-button:hover {
     background-color: #0056b3;
 }
+
+.register-link {
+  margin-top: 1.5rem;
+  text-align: center;
+
+  .register-text {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      color: #0056b3;
+    }
+  }
+}
