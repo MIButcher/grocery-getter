@@ -1,6 +1,7 @@
 services:
   - type: web
     name: grocerygetter-server
+    env: docker
     rootDir: server
     dockerfilePath: Dockerfile
     envVars:
