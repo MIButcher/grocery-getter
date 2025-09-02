@@ -42,6 +42,15 @@ if (builder.Environment.IsDevelopment())
         .WithExposedHeaders("Content-Disposition"))
     );
 }
+else
+{
+    builder.Services.AddCors(cors => cors.AddPolicy("AllowRenderClient", policy => policy
+        .WithOrigins("https://grocerygetter-client.onrender.com")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .WithExposedHeaders("Content-Disposition"))
+    );
+}
 
 var app = builder.Build();
 
@@ -57,6 +66,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else{
+    app.UseCors("AllowRenderClient");
 }
 
 app.UseHttpsRedirection();
