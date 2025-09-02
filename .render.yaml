@@ -6,6 +6,6 @@ services:
     dockerfilePath: Dockerfile
     envVars:
       - key: DefaultConnection
-        value: postgresql://production:fW61hU6JlnTSCLY8vZp7wmLwUPpiyabz@dpg-d2rj2v8gjchc73ak7s0g-a/grocerygetterdb
+        value: "Host=postgresql;Database=grocerygetterdb;Username=production;Password=fW61hU6JlnTSCLY8vZp7wmLwUPpiyabz"
       - key: PostgreSqlConnection
-        value: postgresql://production:fW61hU6JlnTSCLY8vZp7wmLwUPpiyabz@dpg-d2rj2v8gjchc73ak7s0g-a/grocerygetterdb
+        value: "Host=postgresql;Database=grocerygetterdb;Username=production;Password=fW61hU6JlnTSCLY8vZp7wmLwUPpiyabz"
