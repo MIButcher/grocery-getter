@@ -21,6 +21,7 @@ const AddUserProductView: React.FC = () => {
 	const [user] = useAtom(userAtom);
 	const initialProduct = location.state?.product as Product;
     const initialStoreId = location.state?.storeId as number;
+    const unhandledProductsList = location.state?.unhandledProductsList as string;
     const [storeId, setStoreId] = useState<number | undefined>(initialStoreId != 1 ? initialStoreId : undefined );
     const [stores, setStores] = useState<Store[]>([]);
     const [layouts, setLayouts] = useState<Layout[]>([]);
@@ -63,6 +64,33 @@ const AddUserProductView: React.FC = () => {
         const layoutId = layouts.find(l => l.storeId === selectedStore?.id)?.id;
         const layoutAisles = aisles.filter(a => a.layoutId === layoutId);
         setFilteredAisles(layoutAisles);
+        checkForAisleMatch(layoutAisles);
+        setFullUserProduct((prev): FullUserProductRequest => ({
+            ...prev,
+            currentStoreId: value
+        }));
+    };
+
+    const checkForAisleMatch = (layoutAisles: Aisle[]) => {
+        let matchedAisle: Aisle | undefined;
+
+        if (storeAisles.length > 0) {
+            const lastEntry = storeAisles[storeAisles.length - 1];
+            const lastAisleName = lastEntry.split(' - ')[1];
+
+            matchedAisle = layoutAisles.find(a => a.name === lastAisleName);
+
+            // Fallback: check earlier entries if last doesn't match
+            if (!matchedAisle) {
+                for (let i = storeAisles.length - 2; i >= 0; i--) {
+                    const aisleName = storeAisles[i].split(' - ')[1];
+                    matchedAisle = layoutAisles.find(a => a.name === aisleName);
+                    if (matchedAisle) break;
+                }
+            }
+        }
+
+        setAisleId(matchedAisle?.id ?? undefined);
     }
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,13 +128,24 @@ const AddUserProductView: React.FC = () => {
                 new Configuration({ basePath: API_BASE_PATH})
             );
             await userProductApi.addUserProduct({ fullUserProductRequest: fullUserProduct });
-            navigate('/userproducts');
+            navigate('/userproducts', {
+                state: { unhandledTypedList: unhandledProductsList }
+            });
             toast('Product saved successfully!', 'success');
         } catch (error) {
             console.error('Failed to save product:', error);
             toast('Failed to save product. Please try again.', 'error');
         }
 	};
+
+    const handleCancel = () => {
+        const unhandledTypedList = unhandledProductsList && unhandledProductsList.trim()
+            ? `${fullUserProduct.productName},${unhandledProductsList}`
+            : fullUserProduct.productName;
+            navigate('/userproducts', {
+                state: { unhandledTypedList }
+            });
+    }
 
 	return (
 		<div className={styles.mainContainer}>
@@ -167,9 +206,9 @@ const AddUserProductView: React.FC = () => {
                             labelId="store-select-label"
                             value={storeId ?? ''}
                             label="Select Store"
+                            displayEmpty
                             onChange={(e: SelectChangeEvent<number>) => onStoreChange(e.target.value as number)}
                         >
-                            <MenuItem value=''></MenuItem>
                             {stores.map((store) => (
                                 <MenuItem key={store.id} value={store.id}>
                                     {store.name}
@@ -184,10 +223,10 @@ const AddUserProductView: React.FC = () => {
                         <Select
                             labelId="aisle-select-label"
                             value={aisleId ?? ''}
+                            
                             label="Select Aisle"
                             onChange={(e: SelectChangeEvent<number>) => setAisleId(Number(e.target.value))}
                         >   
-                            <MenuItem value=''></MenuItem>
                             {filteredAisles.map((aisle) => (
                                 <MenuItem key={aisle.id} value={aisle.id}>
                                     {aisle.name}
@@ -229,7 +268,7 @@ const AddUserProductView: React.FC = () => {
                     <Button variant="outlined" onClick={handleSave} className="save-button">
                         Save
                     </Button>
-                    <Button variant="outlined" onClick={() => navigate('/userproducts')} className="cancel-button">
+                    <Button variant="outlined" onClick={handleCancel} className="cancel-button">
                         Cancel
                     </Button>
                 </div>

@@ -4,7 +4,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { editModeAtom, userAtom } from '@utilities/atoms';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { ProductApi } from '@apis/ProductApi';
 import { Product } from '@models/Product';
@@ -18,10 +18,12 @@ import styles from '../UserView.module.scss';
 
 const UserProductPage: React.FC = () => {
 	const toast = useToast()
+	const location = useLocation();
 	type Suggestion = Product | { id: 'new'; name: string };
 	const [groceryList, setGroceryList] = useState<GroceryListItem[]>([]);
 	const [products, setProducts] = useState<Product[]>([]);
-	const [typedList, setTypedList] = useState<string>('');
+    const unhandledTypedList = location.state?.unhandledTypedList as string;
+	const [typedList, setTypedList] = useState<string>(unhandledTypedList ?? '');
 	const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 	const [storeId, setStoreId] = useState<number>(1);
 	const [user] = useAtom(userAtom);
@@ -68,8 +70,14 @@ const UserProductPage: React.FC = () => {
 				toast(errorMessage, 'error');
 			}
 		};
+		const checkTypedList = async () => {
+			if (typedList != '') {
+				checkForMatch(typedList);
+			}
+		};
 		fetchUserProducts();
 		fetchProducts();
+		checkTypedList();
 	}, [user, navigate]);
 
 	const checkForMatch = (e: string) => {
@@ -86,7 +94,12 @@ const UserProductPage: React.FC = () => {
 			);
 
 			if (userInput.includes(',')) {
-				setSuggestions([]);
+				const firstWord = userInput.split(",")[0];
+				const extendedSuggestions: Suggestion[] = exactMatch
+				? filtered
+				: [...filtered, { id: 'new', name: `Add "${firstWord}" as a new product` }];
+
+				setSuggestions(extendedSuggestions);
 			} else {
 				const extendedSuggestions: Suggestion[] = exactMatch
 					? filtered
@@ -120,7 +133,7 @@ const UserProductPage: React.FC = () => {
 					id: groceryListItem.userProductId,
 				})) ?? [];
 				setGroceryList(data);
-				setSuggestions([]);
+				checkForMatch(response.unhandledProductsList ?? '');
 				setTypedList(response.unhandledProductsList ?? '');
 			} catch (error: any) {
 				console.error('Error adding products:', error);
@@ -134,9 +147,13 @@ const UserProductPage: React.FC = () => {
 
 	const handleAddNewProduct = async (newProductName: string) => {
 		try {
-			const name = newProductName.charAt(0).toUpperCase() + newProductName.slice(1)
+			const [firstProduct, unhandledProductsList] = newProductName.split(/,(.+)/).filter(Boolean);
+			const name = firstProduct.split(' ')
+				.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+				.join(' ');
+
 			navigate(`/userproducts/add`, {
-				state: { product: { name, id: 0 }, storeId: storeId }
+				state: { product: { name, id: 0 }, storeId: storeId, unhandledProductsList }
 			});
 		} catch (error) {
 			console.error('Error adding new product:', error);
