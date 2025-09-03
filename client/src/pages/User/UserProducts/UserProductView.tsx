@@ -264,11 +264,12 @@ const UserProductPage: React.FC = () => {
 	};
 
 	const columns: GridColDef[] = [
-		{ field: 'aisleName', headerName: 'Aisle', width: 55, disableColumnMenu: true },
+		{ field: 'aisleName', headerName: 'Aisle', width: 55, sortable: false, disableColumnMenu: true },
 		{
 			field: 'productName',
 			headerName: 'Name',
 			flex: 1,
+			sortable: false,
 			disableColumnMenu: true,
 			renderCell: (params) => {
 				const data = params.row.notes ? params.value + ' (' + params.row.notes + ')' : params.value;
@@ -285,11 +286,12 @@ const UserProductPage: React.FC = () => {
 				</span>
 			)},
 		},
-		{ field: 'quantity', headerName: 'Qty', width: 45, disableColumnMenu: true },
+		{ field: 'quantity', headerName: 'Qty', width: 45, sortable: false, disableColumnMenu: true },
 		{
 			field: 'actions',
 			headerName: '',
 			width: 50,
+			sortable: false,
 			disableColumnMenu: true,
 			renderCell: (params) => (
 				editMode ? 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSetUserAndNavigate } from '@hooks/UseSetUserAndNavigate';
 import { useToast } from '@context/toastContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { UserApi } from '@apis/UserApi';
 import { Configuration } from '@generated/runtime';
@@ -19,15 +19,6 @@ const LoginPage: React.FC = () => {
 	const setUserAtom = useSetAtom(userAtom);
     const [showHomePage, setShowHomePage] = useState(true);
     const setUserAndNavigate = useSetUserAndNavigate();
-
-	useEffect(() => {
-		const timer = setTimeout(() => setShowHomePage(false), 3000); // Show HomePage for 3 seconds
-		return () => clearTimeout(timer); // Cleanup timer on unmount
-	}, []);
-
-	if (showHomePage) {
-		return <HomePage />;
-	}
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -77,12 +68,7 @@ const LoginPage: React.FC = () => {
                     <div className="register-link">
                         <p>
                             Don't have an account?{' '}
-                            <span
-                            className="register-text"
-                            onClick={() => navigate('/register')}
-                            >
-                            Register here
-                            </span>
+                            <Link to="/register">Register here</Link>
                         </p>
                     </div>
                 </form>

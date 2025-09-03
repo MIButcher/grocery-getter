@@ -7,7 +7,7 @@ export default function UnauthorizedView() {
   return (
     <Box
       sx={{
-        height: '100vh',
+        height: '96vh',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
