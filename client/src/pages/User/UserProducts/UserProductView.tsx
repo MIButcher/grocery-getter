@@ -13,6 +13,7 @@ import { UserProductApi } from '@apis/UserProductApi';
 import { GroceryListItem } from '@models/GroceryListItem';
 import { Configuration } from '@generated/runtime';
 import { AddShoppingCartIcon, HighlightOffIcon, RemoveShoppingCartIcon, SearchIcon } from '@imports/MaterialUIIcons';
+import { sendSMS } from '@hooks/SendSMS';
 import API_BASE_PATH from '@config/apiConfig';
 import styles from '../UserView.module.scss';
 
@@ -110,6 +111,25 @@ const UserProductPage: React.FC = () => {
 		} else {
 			setSuggestions([]);
 		}
+	};
+
+	const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+		e.preventDefault();
+
+		const pastedText = e.clipboardData.getData('text');
+		const transformed = pastedText
+		.split(/[\n\r,]+/) // split on newlines or commas
+		.map(s => s.trim())
+		.filter(Boolean)
+		.join(', ');
+
+		const input = e.target as HTMLInputElement;
+		const cursorPos = input.selectionStart ?? typedList.length;
+		const newValue =
+		typedList.slice(0, cursorPos) + transformed + typedList.slice(cursorPos);
+
+		setTypedList(newValue);
+		handleAddUserProducts(newValue);
 	};
 
 	const handleAddUserProducts = (e: string, newStoreId?: number) => {
@@ -270,16 +290,6 @@ const UserProductPage: React.FC = () => {
 		}
 	};
 
-	const formatProductListForSMS = () => {
-		const names = groceryList.map(item => item.productName).filter(Boolean);
-		return names.join(',\n'); // comma-return delimited
-	};
-
-	const handleSendSMS = () => {
-		const messageBody = encodeURIComponent(formatProductListForSMS());
-		window.location.href = `sms:?body=${messageBody}`;
-	};
-
 	const columns: GridColDef[] = [
 		{ field: 'aisleName', headerName: 'Aisle', width: 55, sortable: false, disableColumnMenu: true },
 		{
@@ -339,6 +349,7 @@ const UserProductPage: React.FC = () => {
 						margin="normal"
 						value={typedList}
 						onChange={(e) => checkForMatch(e.target.value)}
+						onPaste={handlePaste}
 					/>
 					<IconButton
 						onClick={(e) => handleAddUserProducts(typedList)}
@@ -404,7 +415,7 @@ const UserProductPage: React.FC = () => {
 							}
 							<Button
 								variant="outlined"
-								onClick={handleSendSMS}
+								onClick={() => sendSMS(groceryList)}
 								sx={{
 									backgroundColor: 'transparent',
 									color: 'inherit',

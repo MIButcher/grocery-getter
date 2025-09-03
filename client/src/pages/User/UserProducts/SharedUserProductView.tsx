@@ -10,6 +10,7 @@ import { UserProductApi } from '@apis/UserProductApi';
 import { GroceryListItem } from '@models/GroceryListItem';
 import { Configuration } from '@generated/runtime';
 import { AddCircleOutlineIcon, SearchIcon } from '@imports/MaterialUIIcons';
+import { sendSMS } from '@hooks/SendSMS';
 import API_BASE_PATH from '@config/apiConfig';
 import styles from '../UserView.module.scss';
 
@@ -72,16 +73,6 @@ const SharedUserProductPage: React.FC = () => {
 			}
 		};
 		mergeUserProducts();
-	};
-
-	const formatProductListForSMS = () => {
-		const names = groceryList.map(item => item.productName).filter(Boolean);
-		return names.join(',\n'); // comma-return delimited
-	};
-
-	const handleSendSMS = () => {
-		const messageBody = encodeURIComponent(formatProductListForSMS());
-		window.location.href = `sms:?body=${messageBody}`;
 	};
 
 	const columns: GridColDef[] = [
@@ -167,7 +158,7 @@ const SharedUserProductPage: React.FC = () => {
 					</Button>
 					<Button
 						variant="outlined"
-						onClick={handleSendSMS}
+						onClick={() =>sendSMS(groceryList)}
 					>
 						Text List
 					</Button>
