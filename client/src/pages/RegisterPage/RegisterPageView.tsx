@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useToast } from '@context/toastContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { User } from '@models/User';
 import { UserApi } from '@apis/UserApi';
@@ -103,6 +103,7 @@ const RegisterPage: React.FC = () => {
                 <div className={styles.actions}>
                     <Button variant="outlined" onClick={handleSubmit}>Register</Button>
                 </div>
+                <Link to="/login">Return to Login</Link>
             </div>
         </div>
     );

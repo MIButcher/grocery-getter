@@ -68,7 +68,7 @@ function App() {
         titleText='Grocery Getter'
         sx={{
           backgroundColor: theme.palette.background.container,
-          height: '2.5rem',
+          height: '4vh',
           display: 'flex',
           alignItems: 'center',
           padding: '0 1rem',

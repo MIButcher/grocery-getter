@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useToast } from '@context/toastContext';
 import { useAtom, useSetAtom } from 'jotai';
-import { editModeAtom, userAtom } from '@utilities/atoms';
+import { displayModeAtom, editModeAtom, userAtom } from '@utilities/atoms';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { ProductApi } from '@apis/ProductApi';
 import { Product } from '@models/Product';
@@ -12,16 +12,19 @@ import { UserApi } from '@apis/UserApi';
 import { UserProductApi } from '@apis/UserProductApi';
 import { GroceryListItem } from '@models/GroceryListItem';
 import { Configuration } from '@generated/runtime';
-import { AddShoppingCartIcon, HighlightOffIcon, RemoveShoppingCartIcon, SearchIcon } from '@imports/MaterialUIIcons';
+import { AddShoppingCartIcon, FormatSizeSharpIcon, HighlightOffIcon, RemoveShoppingCartIcon, SearchIcon } from '@imports/MaterialUIIcons';
+import { sendSMS } from '@hooks/SendSMS';
 import API_BASE_PATH from '@config/apiConfig';
 import styles from '../UserView.module.scss';
 
 const UserProductPage: React.FC = () => {
 	const toast = useToast()
+	const location = useLocation();
 	type Suggestion = Product | { id: 'new'; name: string };
 	const [groceryList, setGroceryList] = useState<GroceryListItem[]>([]);
 	const [products, setProducts] = useState<Product[]>([]);
-	const [typedList, setTypedList] = useState<string>('');
+    const unhandledTypedList = location.state?.unhandledTypedList as string;
+	const [typedList, setTypedList] = useState<string>(unhandledTypedList ?? '');
 	const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 	const [storeId, setStoreId] = useState<number>(1);
 	const [user] = useAtom(userAtom);
@@ -29,6 +32,9 @@ const UserProductPage: React.FC = () => {
   	const [editMode] = useAtom(editModeAtom);
 	const [openEmailModal, setOpenEmailModal] = useState(false);
 	const [emailInput, setEmailInput] = useState('');
+  	const [displayMode, setDisplayMode] = useAtom(displayModeAtom);
+	const rowHeight = displayMode === 2 ? 32 : 64;
+	const fontSize = displayMode === 1 ? '1.25rem' : '1rem';
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -68,8 +74,14 @@ const UserProductPage: React.FC = () => {
 				toast(errorMessage, 'error');
 			}
 		};
+		const checkTypedList = async () => {
+			if (typedList != '') {
+				checkForMatch(typedList);
+			}
+		};
 		fetchUserProducts();
 		fetchProducts();
+		checkTypedList();
 	}, [user, navigate]);
 
 	const checkForMatch = (e: string) => {
@@ -86,7 +98,12 @@ const UserProductPage: React.FC = () => {
 			);
 
 			if (userInput.includes(',')) {
-				setSuggestions([]);
+				const firstWord = userInput.split(",")[0];
+				const extendedSuggestions: Suggestion[] = exactMatch
+				? filtered
+				: [...filtered, { id: 'new', name: `Add "${firstWord}" as a new product` }];
+
+				setSuggestions(extendedSuggestions);
 			} else {
 				const extendedSuggestions: Suggestion[] = exactMatch
 					? filtered
@@ -97,6 +114,25 @@ const UserProductPage: React.FC = () => {
 		} else {
 			setSuggestions([]);
 		}
+	};
+
+	const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+		e.preventDefault();
+
+		const pastedText = e.clipboardData.getData('text');
+		const transformed = pastedText
+		.split(/[\n\r,]+/) // split on newlines or commas
+		.map(s => s.trim())
+		.filter(Boolean)
+		.join(', ');
+
+		const input = e.target as HTMLInputElement;
+		const cursorPos = input.selectionStart ?? typedList.length;
+		const newValue =
+		typedList.slice(0, cursorPos) + transformed + typedList.slice(cursorPos);
+
+		setTypedList(newValue);
+		handleAddUserProducts(newValue);
 	};
 
 	const handleAddUserProducts = (e: string, newStoreId?: number) => {
@@ -120,7 +156,7 @@ const UserProductPage: React.FC = () => {
 					id: groceryListItem.userProductId,
 				})) ?? [];
 				setGroceryList(data);
-				setSuggestions([]);
+				checkForMatch(response.unhandledProductsList ?? '');
 				setTypedList(response.unhandledProductsList ?? '');
 			} catch (error: any) {
 				console.error('Error adding products:', error);
@@ -134,9 +170,13 @@ const UserProductPage: React.FC = () => {
 
 	const handleAddNewProduct = async (newProductName: string) => {
 		try {
-			const name = newProductName.charAt(0).toUpperCase() + newProductName.slice(1)
+			const [firstProduct, unhandledProductsList] = newProductName.split(/,(.+)/).filter(Boolean);
+			const name = firstProduct.split(' ')
+				.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+				.join(' ');
+
 			navigate(`/userproducts/add`, {
-				state: { product: { name, id: 0 }, storeId: storeId }
+				state: { product: { name, id: 0 }, storeId: storeId, unhandledProductsList }
 			});
 		} catch (error) {
 			console.error('Error adding new product:', error);
@@ -253,22 +293,17 @@ const UserProductPage: React.FC = () => {
 		}
 	};
 
-	const formatProductListForSMS = () => {
-		const names = groceryList.map(item => item.productName).filter(Boolean);
-		return names.join(',\n'); // comma-return delimited
-	};
-
-	const handleSendSMS = () => {
-		const messageBody = encodeURIComponent(formatProductListForSMS());
-		window.location.href = `sms:?body=${messageBody}`;
+	const cycleDisplayMode = () => {
+		setDisplayMode(prev => (prev + 1) % 3);
 	};
 
 	const columns: GridColDef[] = [
-		{ field: 'aisleName', headerName: 'Aisle', width: 55, disableColumnMenu: true },
+		{ field: 'aisleName', headerName: 'Aisle', width: 55, sortable: false, disableColumnMenu: true },
 		{
 			field: 'productName',
 			headerName: 'Name',
 			flex: 1,
+			sortable: false,
 			disableColumnMenu: true,
 			renderCell: (params) => {
 				const data = params.row.notes ? params.value + ' (' + params.row.notes + ')' : params.value;
@@ -285,23 +320,33 @@ const UserProductPage: React.FC = () => {
 				</span>
 			)},
 		},
-		{ field: 'quantity', headerName: 'Qty', width: 45, disableColumnMenu: true },
+		{ field: 'quantity', headerName: 'Qty', width: 45, sortable: false, disableColumnMenu: true },
 		{
 			field: 'actions',
 			headerName: '',
 			width: 50,
+			sortable: false,
 			disableColumnMenu: true,
+			renderHeader: () => (
+				<IconButton
+					onClick={cycleDisplayMode}
+					size="small"
+					style={{ color: 'var(--text-primary)', padding: 0 }}
+				>
+					<FormatSizeSharpIcon />
+				</IconButton>
+			),
 			renderCell: (params) => (
 				editMode ? 
 					<IconButton
 						onClick={() => handleDeleteUserProduct(params.row.userProductId)}
-						style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', paddingBottom: '1rem' }}
+						style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', height: '1.5rem', padding: '0' }}
 					>
 						<HighlightOffIcon />
 					</IconButton> :
 					<IconButton
 						onClick={() => handleUserProductInCart(params.row)}
-						style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', paddingBottom: '1rem' }}
+						style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', height: '1.5rem', padding: '0' }}
 					>
 						{params.row.inCart ? <RemoveShoppingCartIcon/> : <AddShoppingCartIcon />}
 					</IconButton>
@@ -320,6 +365,7 @@ const UserProductPage: React.FC = () => {
 						margin="normal"
 						value={typedList}
 						onChange={(e) => checkForMatch(e.target.value)}
+						onPaste={handlePaste}
 					/>
 					<IconButton
 						onClick={(e) => handleAddUserProducts(typedList)}
@@ -349,9 +395,15 @@ const UserProductPage: React.FC = () => {
 				<DataGrid
 					rows={groceryList}
 					columns={columns}
+					rowHeight={rowHeight}
 					getCellClassName={(params) =>
 						params.row.inCart ? styles.lineThrough : ''
 					}
+					sx={{
+						'& .MuiDataGrid-row': {
+						fontSize,
+						},
+					}}
 				/>
 			</div>
 			<div className={styles.actionsContainer}>
@@ -385,7 +437,7 @@ const UserProductPage: React.FC = () => {
 							}
 							<Button
 								variant="outlined"
-								onClick={handleSendSMS}
+								onClick={() => sendSMS(groceryList)}
 								sx={{
 									backgroundColor: 'transparent',
 									color: 'inherit',
