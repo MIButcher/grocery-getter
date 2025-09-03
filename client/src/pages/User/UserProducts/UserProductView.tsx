@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useToast } from '@context/toastContext';
 import { useAtom, useSetAtom } from 'jotai';
-import { editModeAtom, userAtom } from '@utilities/atoms';
+import { displayModeAtom, editModeAtom, userAtom } from '@utilities/atoms';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
@@ -12,7 +12,7 @@ import { UserApi } from '@apis/UserApi';
 import { UserProductApi } from '@apis/UserProductApi';
 import { GroceryListItem } from '@models/GroceryListItem';
 import { Configuration } from '@generated/runtime';
-import { AddShoppingCartIcon, HighlightOffIcon, RemoveShoppingCartIcon, SearchIcon } from '@imports/MaterialUIIcons';
+import { AddShoppingCartIcon, FormatSizeSharpIcon, HighlightOffIcon, RemoveShoppingCartIcon, SearchIcon } from '@imports/MaterialUIIcons';
 import { sendSMS } from '@hooks/SendSMS';
 import API_BASE_PATH from '@config/apiConfig';
 import styles from '../UserView.module.scss';
@@ -32,6 +32,9 @@ const UserProductPage: React.FC = () => {
   	const [editMode] = useAtom(editModeAtom);
 	const [openEmailModal, setOpenEmailModal] = useState(false);
 	const [emailInput, setEmailInput] = useState('');
+  	const [displayMode, setDisplayMode] = useAtom(displayModeAtom);
+	const rowHeight = displayMode === 2 ? 32 : 64;
+	const fontSize = displayMode === 1 ? '1.25rem' : '1rem';
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -290,6 +293,10 @@ const UserProductPage: React.FC = () => {
 		}
 	};
 
+	const cycleDisplayMode = () => {
+		setDisplayMode(prev => (prev + 1) % 3);
+	};
+
 	const columns: GridColDef[] = [
 		{ field: 'aisleName', headerName: 'Aisle', width: 55, sortable: false, disableColumnMenu: true },
 		{
@@ -320,17 +327,26 @@ const UserProductPage: React.FC = () => {
 			width: 50,
 			sortable: false,
 			disableColumnMenu: true,
+			renderHeader: () => (
+				<IconButton
+					onClick={cycleDisplayMode}
+					size="small"
+					style={{ color: 'var(--text-primary)', padding: 0 }}
+				>
+					<FormatSizeSharpIcon />
+				</IconButton>
+			),
 			renderCell: (params) => (
 				editMode ? 
 					<IconButton
 						onClick={() => handleDeleteUserProduct(params.row.userProductId)}
-						style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', paddingBottom: '1rem' }}
+						style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', height: '1.5rem', padding: '0' }}
 					>
 						<HighlightOffIcon />
 					</IconButton> :
 					<IconButton
 						onClick={() => handleUserProductInCart(params.row)}
-						style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', paddingBottom: '1rem' }}
+						style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', height: '1.5rem', padding: '0' }}
 					>
 						{params.row.inCart ? <RemoveShoppingCartIcon/> : <AddShoppingCartIcon />}
 					</IconButton>
@@ -379,9 +395,15 @@ const UserProductPage: React.FC = () => {
 				<DataGrid
 					rows={groceryList}
 					columns={columns}
+					rowHeight={rowHeight}
 					getCellClassName={(params) =>
 						params.row.inCart ? styles.lineThrough : ''
 					}
+					sx={{
+						'& .MuiDataGrid-row': {
+						fontSize,
+						},
+					}}
 				/>
 			</div>
 			<div className={styles.actionsContainer}>
