@@ -1,23 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSetUserAndNavigate } from '@hooks/UseSetUserAndNavigate';
 import { useToast } from '@context/toastContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { UserApi } from '@apis/UserApi';
 import { Configuration } from '@generated/runtime';
-import { useSetAtom } from 'jotai';
-import { userAtom } from '@utilities/atoms';
-import HomePage from '../HomePage/HomePageView';
 import API_BASE_PATH from '@config/apiConfig';
 import './LoginPageView.scss';
 
 const LoginPage: React.FC = () => {
 	const toast = useToast()
-	const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-	const setUserAtom = useSetAtom(userAtom);
-    const [showHomePage, setShowHomePage] = useState(true);
     const setUserAndNavigate = useSetUserAndNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {

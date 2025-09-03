@@ -42,17 +42,17 @@ export const darkTheme: IThemeConfiguration = {
       MuiMenu: {
         styleOverrides: {
           paper: {
-            backgroundColor: '#28343C',
+            backgroundColor: '#365173',
           },
           list: {
-            backgroundColor: '#28343C',
+            backgroundColor: '#365173',
           },
         },
       },
       MuiMenuItem: {
         styleOverrides: {
           root: {
-            backgroundColor: '#28343C',
+            backgroundColor: '#365173',
             '&.Mui-selected': {
               backgroundColor: '#31455C',
               color: '#8DCDF7',
