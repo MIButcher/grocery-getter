@@ -34,7 +34,7 @@ const UserProductPage: React.FC = () => {
 	const [emailInput, setEmailInput] = useState('');
   	const [displayMode, setDisplayMode] = useAtom(displayModeAtom);
 	const rowHeight = displayMode === 2 ? 32 : 64;
-	const fontSize = displayMode === 1 ? '1.25rem' : '1rem';
+	const fontSize = displayMode === 1 ? '1.25rem' : '0.875rem';
 	const navigate = useNavigate();
 
 	useEffect(() => {
