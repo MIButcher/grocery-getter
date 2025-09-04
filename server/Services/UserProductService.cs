@@ -254,11 +254,20 @@ namespace GroceryGetter.Services
                 .Distinct()
                 .ToListAsync();
 
-            var aisleLinks = allValidAisleIds.Select(aisleId => new AisleProduct
+            var aisleLinks = new List<AisleProduct>();
+            foreach (var aisleId in allValidAisleIds)
             {
-                ProductId = product.Id,
-                AisleId = aisleId
-            });
+                var maxLineup = await _context.AisleProduct
+                    .Where(ap => ap.AisleId == aisleId)
+                    .MaxAsync(ap => (int?)ap.Lineup) ?? 1;
+
+                aisleLinks.Add(new AisleProduct
+                {
+                    ProductId = product.Id,
+                    AisleId = aisleId,
+                    Lineup = maxLineup + 1
+                });
+            }
             _context.AisleProduct.AddRange(aisleLinks);
 
             var userProduct = new UserProduct

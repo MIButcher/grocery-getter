@@ -60,6 +60,12 @@ export interface AisleProduct {
     isVerified?: boolean;
     /**
      * 
+     * @type {number}
+     * @memberof AisleProduct
+     */
+    lineup?: number;
+    /**
+     * 
      * @type {Product}
      * @memberof AisleProduct
      */
@@ -93,6 +99,7 @@ export function AisleProductFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'productId': json['productId'] == null ? undefined : json['productId'],
         'aisleId': json['aisleId'] == null ? undefined : json['aisleId'],
         'isVerified': json['isVerified'] == null ? undefined : json['isVerified'],
+        'lineup': json['lineup'] == null ? undefined : json['lineup'],
         'product': json['product'] == null ? undefined : ProductFromJSON(json['product']),
         'aisle': json['aisle'] == null ? undefined : AisleFromJSON(json['aisle']),
     };
@@ -113,6 +120,7 @@ export function AisleProductToJSONTyped(value?: AisleProduct | null, ignoreDiscr
         'productId': value['productId'],
         'aisleId': value['aisleId'],
         'isVerified': value['isVerified'],
+        'lineup': value['lineup'],
         'product': ProductToJSON(value['product']),
         'aisle': AisleToJSON(value['aisle']),
     };

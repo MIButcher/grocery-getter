@@ -63,7 +63,6 @@ namespace GroceryGetter.Database
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(150);
             });
 
-            // AisleProduct
             modelBuilder.Entity<AisleProduct>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -77,6 +76,10 @@ namespace GroceryGetter.Database
                       .WithMany()
                       .HasForeignKey(e => e.AisleId)
                       .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasIndex(e => new { e.ProductId, e.Lineup })
+                      .IsUnique()
+                      .HasDatabaseName("UQ_AisleProduct_ProductId_Lineup");
             });
 
             // User
