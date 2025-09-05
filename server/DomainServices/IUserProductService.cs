@@ -56,11 +56,11 @@ namespace GroceryGetter.DomainServices
         /// <returns>A list of all UserProduct objects.</returns>
         Task<List<UserProduct>> GetAllUserProducts();
 
-        /// <summary>
-        /// Retrieves all data needed to insert a new Product, associated AisleProducts, and UserProduct.
-        /// </summary>
-        /// <returns>StoreLayoutAisleData containing Stores, Layouts, and Aisles.</returns>
-        Task<StoreLayoutAisleData> GetAddNewUserProductData();
+        ///// <summary>
+        ///// Retrieves all data needed to insert a new Product, associated AisleProducts, and UserProduct.
+        ///// </summary>
+        ///// <returns>StoreLayoutAisleData containing Stores, Layouts, and Aisles.</returns>
+        //Task<StoreLayoutAisleData> GetAddNewUserProductData();
 
         /// <summary>
         /// Saves a new or existing UserProduct.

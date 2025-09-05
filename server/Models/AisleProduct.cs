@@ -7,7 +7,7 @@ namespace GroceryGetter.Models
         public int AisleId { get; set; }
         public bool IsVerified { get; set; }
         public int Lineup { get; set; }
-        public Product Product { get; set; }
-        public Aisle Aisle { get; set; }
+        public virtual Product Product { get; set; }
+        public virtual Aisle Aisle { get; set; }
     }
 }

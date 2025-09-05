@@ -81,30 +81,6 @@ namespace GroceryGetter.Services
             return await _context.UserProduct.ToListAsync();
         }
 
-        public async Task<StoreLayoutAisleData> GetAddNewUserProductData()
-        {
-            var stores = await _context.Store
-        .Where(s => s.Name != "Alphabetical")
-        .ToArrayAsync();
-
-            var activeLayouts = await _context.Layout
-                .Where(l => l.IsActive && l.Name != "Alphabetical-A-Z")
-                .ToArrayAsync();
-
-            var layoutIds = activeLayouts.Select(l => l.Id).ToList();
-
-            var aisles = await _context.Aisle
-                .Where(a => layoutIds.Contains(a.LayoutId))
-                .ToArrayAsync();
-
-            return new StoreLayoutAisleData
-            {
-                Stores = stores,
-                ActiveLayouts = activeLayouts,
-                Aisles = aisles
-            };
-        }
-
         public async Task<UserProduct> SaveUserProduct(UserProduct userProduct)
         {
             if (userProduct.Id > 0)

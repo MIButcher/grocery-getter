@@ -6,6 +6,6 @@ namespace GroceryGetter.Models
         public int StoreId { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
-        public Store Store { get; set; }
+        public virtual Store Store { get; set; }
     }
 }

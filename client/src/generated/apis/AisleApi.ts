@@ -138,7 +138,7 @@ export class AisleApi extends runtime.BaseAPI {
 
     /**
      */
-    async saveAisleRaw(requestParameters: SaveAisleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Aisle>> {
+    async saveAisleRaw(requestParameters: SaveAisleRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Aisle>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -156,12 +156,12 @@ export class AisleApi extends runtime.BaseAPI {
             body: AisleToJSON(requestParameters['aisle']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AisleFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AisleFromJSON));
     }
 
     /**
      */
-    async saveAisle(requestParameters: SaveAisleRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Aisle> {
+    async saveAisle(requestParameters: SaveAisleRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Aisle>> {
         const response = await this.saveAisleRaw(requestParameters, initOverrides);
         return await response.value();
     }

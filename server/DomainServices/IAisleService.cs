@@ -32,6 +32,6 @@ namespace GroceryGetter.DomainServices
         /// <exception cref="InvalidOperationException">
         /// Thrown if a duplicate aisle name is found within the same layout.
         /// </exception>
-        Task<Aisle> SaveAisle(Aisle aisle);
+        Task<IEnumerable<Aisle>> SaveAisle(Aisle aisle);
     }
 }

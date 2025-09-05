@@ -6,6 +6,6 @@ namespace GroceryGetter.Models
         public int LayoutId { get; set; }
         public string Name { get; set; }
         public int Lineup { get; set; }
-        public Layout Layout { get; set; }
+        public virtual Layout Layout { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ContrastIcon from '@mui/icons-material/Contrast';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import Edit from '@mui/icons-material/Edit';
@@ -12,6 +14,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 export {
   AddCircleOutlineIcon,
   AddShoppingCartIcon,
+  ArrowDownwardIcon,
+  ArrowUpwardIcon,
   ContrastIcon,
   DarkModeIcon,
   Edit as EditIcon,

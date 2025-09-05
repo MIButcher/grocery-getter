@@ -16,14 +16,21 @@
 import * as runtime from '../runtime';
 import type {
   Store,
+  StoreLayoutAisleData,
 } from '../models/index';
 import {
     StoreFromJSON,
     StoreToJSON,
+    StoreLayoutAisleDataFromJSON,
+    StoreLayoutAisleDataToJSON,
 } from '../models/index';
 
 export interface GetStoreByIdRequest {
     storeId: number;
+}
+
+export interface GetStoreLayoutAisleDataRequest {
+    isActiveLayout: boolean;
 }
 
 export interface SaveStoreRequest {
@@ -67,6 +74,41 @@ export class StoreApi extends runtime.BaseAPI {
      */
     async getStoreById(requestParameters: GetStoreByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Store> {
         const response = await this.getStoreByIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getStoreLayoutAisleDataRaw(requestParameters: GetStoreLayoutAisleDataRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StoreLayoutAisleData>> {
+        if (requestParameters['isActiveLayout'] == null) {
+            throw new runtime.RequiredError(
+                'isActiveLayout',
+                'Required parameter "isActiveLayout" was null or undefined when calling getStoreLayoutAisleData().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/api/stores/storeLayoutAisle/{isActiveLayout}`;
+        urlPath = urlPath.replace(`{${"isActiveLayout"}}`, encodeURIComponent(String(requestParameters['isActiveLayout'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => StoreLayoutAisleDataFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getStoreLayoutAisleData(requestParameters: GetStoreLayoutAisleDataRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StoreLayoutAisleData> {
+        const response = await this.getStoreLayoutAisleDataRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

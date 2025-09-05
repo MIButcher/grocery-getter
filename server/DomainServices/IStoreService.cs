@@ -1,3 +1,4 @@
+using GroceryGetter.DomainServices.Models;
 using GroceryGetter.Models;
 
 namespace GroceryGetter.DomainServices
@@ -16,6 +17,12 @@ namespace GroceryGetter.DomainServices
         /// </summary>
         /// <returns>A list of all stores.</returns>
         Task<List<Store>> GetAllStores();
+
+        /// <summary>
+        /// Retrieves all data needed to insert/update a Store's (Layout's) Aisle information (used in Admin area).
+        /// </summary>
+        /// <returns>A list of Stores, Layouts associated with the Stores, and Aisles associated with the Layouts.</returns>
+        Task<StoreLayoutAisleData> GetStoreLayoutAisleData(bool isActiveLayout);
 
         /// <summary>
         /// Saves a store to the database. Updates if the store exists, otherwise creates a new one.

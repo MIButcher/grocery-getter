@@ -1,6 +1,8 @@
 using GroceryGetter.Models;
 using GroceryGetter.DomainServices; // Updated namespace
 using Microsoft.AspNetCore.Mvc;
+using GroceryGetter.DomainServices.Models;
+using GroceryGetter.Services;
 
 namespace GroceryGetter.Controllers
 {
@@ -39,6 +41,16 @@ namespace GroceryGetter.Controllers
         public async Task<IEnumerable<Store>> GetStores()
         {
             return await _storeService.GetAllStores();
+        }
+
+        /// <summary>
+        /// Retrieves all data needed to insert/update a Store's (Layout's) Aisle information (used in Admin area).
+        /// </summary>
+        /// <returns>A list of Stores, active Layouts associated with the Stores, and Aisles associated with the Layouts.</returns>
+        [HttpGet("storeLayoutAisle/{isActiveLayout}", Name = "GetStoreLayoutAisleData")]
+        public async Task<StoreLayoutAisleData> GetStoreLayoutAisleData(bool isActiveLayout)
+        {
+            return await _storeService.GetStoreLayoutAisleData(isActiveLayout);
         }
 
         /// <summary>
