@@ -53,9 +53,7 @@ const AislePage: React.FC = () => {
 
                     if (selectedLayout) {
                         setLayout(selectedLayout);
-                        const layoutAisles = fetchedAisles
-                            .filter(a => a.layoutId === selectedLayout.id)
-                            .sort((a, b) => (a.lineup ?? Infinity) - (b.lineup ?? Infinity));
+                        const layoutAisles = prepLayoutAislesForGrid(selectedLayout, fetchedAisles);
                         setLayoutAisles(layoutAisles);
                     }
                 }
@@ -69,6 +67,12 @@ const AislePage: React.FC = () => {
 
         fetchStoreLayoutAisleData();
     }, []);
+
+	const prepLayoutAislesForGrid = (selectedLayout: Layout, layoutAisles: Aisle[]) => {
+		return layoutAisles
+			.filter(a => a.layoutId === selectedLayout.id && a.name !== 'InCart' && a.name !== 'Unassigned')
+			.sort((a, b) => (a.lineup ?? Infinity) - (b.lineup ?? Infinity));
+	}
 
     // Persist selection to localStorage
     const onStoreChange = (value: number) => {
@@ -89,9 +93,7 @@ const AislePage: React.FC = () => {
         const selectedLayout = layouts.find(l => l.id === value);
         if (selectedLayout) {
             setLayout(selectedLayout);
-            const layoutAisles = aisles
-                .filter(a => a.layoutId === selectedLayout.id)
-                .sort((a, b) => (a.lineup ?? Infinity) - (b.lineup ?? Infinity));
+            const layoutAisles = prepLayoutAislesForGrid(selectedLayout, aisles);
             setLayoutAisles(layoutAisles);
         }
     };
@@ -215,7 +217,7 @@ const AislePage: React.FC = () => {
   					sortModel={[{ field: 'lineup', sort: 'asc' }]}
 					initialState={{
 						pagination: {
-							paginationModel: { pageSize: 50 },
+							paginationModel: { pageSize: 100 },
 						},
 					}}
 					pageSizeOptions={[25, 50, 100]}

@@ -22,6 +22,8 @@
     <EmbeddedResource Include="Database\Scripts\Mig202508212218\AddAlphabeticalData.sql" />
     <EmbeddedResource Include="Database\Scripts\Mig202509040855\SequenceInitialAisleProductLineup.sql" />
     <EmbeddedResource Include="Database\Scripts\Mig202509040855\UpdateGetGroceryListItemsSP.sql" />
+    <EmbeddedResource Include="Database\Scripts\Mig202509051240\AddNewAldiLayout.sql" />
+    <EmbeddedResource Include="Database\Scripts\Mig202509051240\UpdateAldiAisleData.sql" />
   </ItemGroup>
 
   <ItemGroup>
