@@ -60,7 +60,7 @@ namespace GroceryGetter.Controllers
         /// Thrown if an aisle with the same name already exists in the layout.
         /// </exception>
         [HttpPost(Name = "SaveAisle")]
-        public async Task<Aisle> SaveAisle(Aisle aisle)
+        public async Task<IEnumerable<Aisle>> SaveAisle(Aisle aisle)
         {
             return await _aisleService.SaveAisle(aisle);
         }

@@ -92,15 +92,15 @@ namespace GroceryGetter.Controllers
             return await _userProductService.GetAllUserProducts();
         }
 
-        /// <summary>
-        /// Retrieves all data needed to insert a new Product, associated AisleProducts and UserProduct.
-        /// </summary>
-        /// <returns>A list of Stores, active Layouts associated with the Stores, and Aisles associated with the Layouts.</returns>
-        [HttpGet("storeLayoutAisleData", Name = "GetAddNewUserProductData")]
-        public async Task<StoreLayoutAisleData> GetAddNewUserProductData()
-        {
-            return await _userProductService.GetAddNewUserProductData();
-        }
+        ///// <summary>
+        ///// Retrieves all data needed to insert a new Product, associated AisleProducts and UserProduct.
+        ///// </summary>
+        ///// <returns>A list of Stores, active Layouts associated with the Stores, and Aisles associated with the Layouts.</returns>
+        //[HttpGet("storeLayoutAisleData", Name = "GetAddNewUserProductData")]
+        //public async Task<StoreLayoutAisleData> GetAddNewUserProductData()
+        //{
+        //    return await _userProductService.GetAddNewUserProductData();
+        //}
 
         /// <summary>
         /// Creates a new UserProduct or updates an existing UserProduct.

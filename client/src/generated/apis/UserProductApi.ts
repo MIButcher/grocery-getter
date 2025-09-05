@@ -18,7 +18,6 @@ import type {
   AddUserProductsResult,
   FullUserProductRequest,
   GroceryListItem,
-  StoreLayoutAisleData,
   UserProduct,
   UserProductsCriteria,
   UserProductsMergeCriteria,
@@ -30,8 +29,6 @@ import {
     FullUserProductRequestToJSON,
     GroceryListItemFromJSON,
     GroceryListItemToJSON,
-    StoreLayoutAisleDataFromJSON,
-    StoreLayoutAisleDataToJSON,
     UserProductFromJSON,
     UserProductToJSON,
     UserProductsCriteriaFromJSON,
@@ -257,33 +254,6 @@ export class UserProductApi extends runtime.BaseAPI {
      */
     async deleteUserProduct(requestParameters: DeleteUserProductRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteUserProductRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async getAddNewUserProductDataRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StoreLayoutAisleData>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-
-        let urlPath = `/api/userProducts/storeLayoutAisleData`;
-
-        const response = await this.request({
-            path: urlPath,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => StoreLayoutAisleDataFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async getAddNewUserProductData(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StoreLayoutAisleData> {
-        const response = await this.getAddNewUserProductDataRaw(initOverrides);
-        return await response.value();
     }
 
     /**

@@ -33,6 +33,12 @@ export interface GroceryListItem {
     aisleLineup?: number | null;
     /**
      * 
+     * @type {number}
+     * @memberof GroceryListItem
+     */
+    productLineup?: number | null;
+    /**
+     * 
      * @type {string}
      * @memberof GroceryListItem
      */
@@ -94,6 +100,7 @@ export function GroceryListItemFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'userProductId': json['userProductId'] == null ? undefined : json['userProductId'],
         'aisleLineup': json['aisleLineup'] == null ? undefined : json['aisleLineup'],
+        'productLineup': json['productLineup'] == null ? undefined : json['productLineup'],
         'productName': json['productName'] == null ? undefined : json['productName'],
         'aisleName': json['aisleName'] == null ? undefined : json['aisleName'],
         'quantity': json['quantity'] == null ? undefined : json['quantity'],
@@ -117,6 +124,7 @@ export function GroceryListItemToJSONTyped(value?: GroceryListItem | null, ignor
         
         'userProductId': value['userProductId'],
         'aisleLineup': value['aisleLineup'],
+        'productLineup': value['productLineup'],
         'productName': value['productName'],
         'aisleName': value['aisleName'],
         'quantity': value['quantity'],

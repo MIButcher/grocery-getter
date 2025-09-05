@@ -81,30 +81,6 @@ namespace GroceryGetter.Services
             return await _context.UserProduct.ToListAsync();
         }
 
-        public async Task<StoreLayoutAisleData> GetAddNewUserProductData()
-        {
-            var stores = await _context.Store
-        .Where(s => s.Name != "Alphabetical")
-        .ToArrayAsync();
-
-            var activeLayouts = await _context.Layout
-                .Where(l => l.IsActive && l.Name != "Alphabetical-A-Z")
-                .ToArrayAsync();
-
-            var layoutIds = activeLayouts.Select(l => l.Id).ToList();
-
-            var aisles = await _context.Aisle
-                .Where(a => layoutIds.Contains(a.LayoutId))
-                .ToArrayAsync();
-
-            return new StoreLayoutAisleData
-            {
-                Stores = stores,
-                ActiveLayouts = activeLayouts,
-                Aisles = aisles
-            };
-        }
-
         public async Task<UserProduct> SaveUserProduct(UserProduct userProduct)
         {
             if (userProduct.Id > 0)
@@ -254,11 +230,20 @@ namespace GroceryGetter.Services
                 .Distinct()
                 .ToListAsync();
 
-            var aisleLinks = allValidAisleIds.Select(aisleId => new AisleProduct
+            var aisleLinks = new List<AisleProduct>();
+            foreach (var aisleId in allValidAisleIds)
             {
-                ProductId = product.Id,
-                AisleId = aisleId
-            });
+                var maxLineup = await _context.AisleProduct
+                    .Where(ap => ap.AisleId == aisleId)
+                    .MaxAsync(ap => (int?)ap.Lineup) ?? 1;
+
+                aisleLinks.Add(new AisleProduct
+                {
+                    ProductId = product.Id,
+                    AisleId = aisleId,
+                    Lineup = maxLineup + 1
+                });
+            }
             _context.AisleProduct.AddRange(aisleLinks);
 
             var userProduct = new UserProduct

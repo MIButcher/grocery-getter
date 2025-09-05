@@ -30,7 +30,7 @@ const AisleDetails: React.FC = () => {
             );
 			await aisleApi.saveAisle({aisle});
             navigate('/admin/aisles');
-			toast('Aisle saved successfully!', 'error');
+			toast('Aisle saved successfully!', 'success');
 		} catch (error) {
 			console.error('Failed to save aisle:', error);
 			toast('Failed to save aisle. Please try again.', 'error');
@@ -43,12 +43,7 @@ const AisleDetails: React.FC = () => {
 			<form className={styles.form}>
                 <div className={styles.formGroup}>
 					<label>Layout Id:</label>
-					<input
-						type="number"
-						name="layoutId"
-						value={aisle.layoutId ?? ''}
-						onChange={handleChange}
-					/>
+					<label>{aisle.layoutId ?? ''}</label>
 				</div>
                 <div className={styles.formGroup}>
 					<label>Name:</label>

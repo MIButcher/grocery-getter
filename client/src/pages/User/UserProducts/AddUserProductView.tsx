@@ -5,6 +5,7 @@ import { userAtom } from '@utilities/atoms';
 import { Button, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { Product } from '@models/Product';
 import { UserProductApi } from '@apis/UserProductApi';
+import { StoreApi } from '@apis/StoreApi';
 import { Store } from '@models/Store';
 import { Layout } from '@models/Layout';
 import { Aisle } from '@models/Aisle';
@@ -35,15 +36,15 @@ const AddUserProductView: React.FC = () => {
     useEffect(() => {
         const fetchStoreLayoutAisleData = async () => {
             try {
-                const userProductApi = new UserProductApi(
+                const storeApi = new StoreApi(
                     new Configuration({ basePath: API_BASE_PATH})
                 );
-                const response = await userProductApi.getAddNewUserProductData();
+                const response = await storeApi.getStoreLayoutAisleData({ isActiveLayout: true });
                 setStores(response.stores ?? []);
-                setLayouts(response.activeLayouts ?? []);
+                setLayouts(response.layouts ?? []);
                 setAisles(response.aisles ?? []);
                 if (storeId) {
-                    const layoutId = response.activeLayouts?.find(l => l.storeId === storeId)?.id;
+                    const layoutId = response.layouts?.find(l => l.storeId === storeId)?.id;
                     const layoutAisles = response.aisles?.filter(a => a.layoutId === layoutId);
                     setFilteredAisles(layoutAisles ?? []);
                 }

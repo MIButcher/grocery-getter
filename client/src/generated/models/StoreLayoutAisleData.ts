@@ -52,7 +52,7 @@ export interface StoreLayoutAisleData {
      * @type {Array<Layout>}
      * @memberof StoreLayoutAisleData
      */
-    activeLayouts?: Array<Layout> | null;
+    layouts?: Array<Layout> | null;
     /**
      * 
      * @type {Array<Aisle>}
@@ -79,7 +79,7 @@ export function StoreLayoutAisleDataFromJSONTyped(json: any, ignoreDiscriminator
     return {
         
         'stores': json['stores'] == null ? undefined : ((json['stores'] as Array<any>).map(StoreFromJSON)),
-        'activeLayouts': json['activeLayouts'] == null ? undefined : ((json['activeLayouts'] as Array<any>).map(LayoutFromJSON)),
+        'layouts': json['layouts'] == null ? undefined : ((json['layouts'] as Array<any>).map(LayoutFromJSON)),
         'aisles': json['aisles'] == null ? undefined : ((json['aisles'] as Array<any>).map(AisleFromJSON)),
     };
 }
@@ -96,7 +96,7 @@ export function StoreLayoutAisleDataToJSONTyped(value?: StoreLayoutAisleData | n
     return {
         
         'stores': value['stores'] == null ? undefined : ((value['stores'] as Array<any>).map(StoreToJSON)),
-        'activeLayouts': value['activeLayouts'] == null ? undefined : ((value['activeLayouts'] as Array<any>).map(LayoutToJSON)),
+        'layouts': value['layouts'] == null ? undefined : ((value['layouts'] as Array<any>).map(LayoutToJSON)),
         'aisles': value['aisles'] == null ? undefined : ((value['aisles'] as Array<any>).map(AisleToJSON)),
     };
 }

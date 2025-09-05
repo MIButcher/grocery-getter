@@ -13,7 +13,7 @@ import { UserProductApi } from '@apis/UserProductApi';
 import { GroceryListItem } from '@models/GroceryListItem';
 import { Configuration } from '@generated/runtime';
 import { AddShoppingCartIcon, FormatSizeSharpIcon, HighlightOffIcon, RemoveShoppingCartIcon, SearchIcon } from '@imports/MaterialUIIcons';
-import { sendSMS } from '@hooks/SendSMS';
+import { sendSMS } from '@utilities/sendSMS';
 import API_BASE_PATH from '@config/apiConfig';
 import styles from '../UserView.module.scss';
 
