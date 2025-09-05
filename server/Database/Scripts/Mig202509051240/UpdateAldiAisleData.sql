@@ -74,6 +74,10 @@ BEGIN
     SELECT "Id" INTO ProductId FROM "Product" WHERE "Name" = 'Carrots';
     INSERT INTO "AisleProduct"("AisleId", "ProductId", "IsVerified", "Lineup")
     VALUES (AisleId, ProductId, true, 1);
+    
+    SELECT "Id" INTO ProductId FROM "Product" WHERE "Name" = 'Potatos';
+    INSERT INTO "AisleProduct"("AisleId", "ProductId", "IsVerified", "Lineup")
+    VALUES (AisleId, ProductId, true, 2);
 
     -- AISLE Sweet Treats - Aldi De Pere
     SELECT a."Id" INTO AisleId 
@@ -221,13 +225,9 @@ BEGIN
     INSERT INTO "AisleProduct"("AisleId", "ProductId", "IsVerified", "Lineup")
     VALUES (AisleId, ProductId, true, 3);
 
-    SELECT "Id" INTO ProductId FROM "Product" WHERE "Name" = 'Pretzels';
-    INSERT INTO "AisleProduct"("AisleId", "ProductId", "IsVerified", "Lineup")
-    VALUES (AisleId, ProductId, true, 4);
-
     SELECT "Id" INTO ProductId FROM "Product" WHERE "Name" = 'Popcorn (Bagged)';
     INSERT INTO "AisleProduct"("AisleId", "ProductId", "IsVerified", "Lineup")
-    VALUES (AisleId, ProductId, true, 5);
+    VALUES (AisleId, ProductId, true, 4);
 
     -- AISLE Baking - Aldi De Pere
     SELECT a."Id" INTO AisleId 
