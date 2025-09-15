@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSetAtom } from 'jotai';
 import { globalLoadingAtom } from '@utilities/atoms';
 import { useSetUserAndNavigate } from '@hooks/UseSetUserAndNavigate';
@@ -16,6 +16,10 @@ const LoginPage: React.FC = () => {
     const [password, setPassword] = useState('');
     const setLoading = useSetAtom(globalLoadingAtom);
     const setUserAndNavigate = useSetUserAndNavigate();
+
+	useEffect(() => {
+		setLoading(false);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
