@@ -70,13 +70,13 @@ const LayoutPage: React.FC = () => {
 					columns={columns}
 					initialState={{
 						pagination: {
-							paginationModel: { pageSize: 5 },
+							paginationModel: { pageSize: 10 },
 						},
 						sorting: {
 							sortModel: [{ field: 'name', sort: 'asc' }],
 						},
 					}}
-					pageSizeOptions={[5, 10, 20]}
+					pageSizeOptions={[10, 25, 50]}
 				/>
 			</div>
 			<div className={styles.actionsContainer}>

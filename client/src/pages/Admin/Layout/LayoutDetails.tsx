@@ -46,11 +46,12 @@ const LayoutDetails: React.FC = () => {
 
 	const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const { name, value } = e.target;
+		const store = stores.find(store => store.id === parseInt(value));
 		setLayout((prevLayout) => ({
 			...prevLayout,
 			[name]: value ? parseInt(value) : undefined,
+			store: store || undefined,
 		}));
-		const store = stores.find(store => store.id === parseInt(value));
 		const suggestedName = store ? store.name + '-' + store.city : '';
 		const isNameTaken = layouts.some(existingLayout => existingLayout.name === suggestedName);
 		if (isNameTaken) {
