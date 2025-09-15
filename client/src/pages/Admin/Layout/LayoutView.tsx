@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { Button, IconButton } from "@mui/material";
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { LayoutApi } from '@apis/LayoutApi';
 import { Layout } from '@models/Layout';
@@ -13,7 +16,8 @@ import styles from '../AdminView.module.scss';
 const LayoutPage: React.FC = () => {
 	const toast = useToast()
 	const [layouts, setLayouts] = useState<Layout[]>([]);
-	const navigate = useNavigate();
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
 
 	useEffect(() => {
 		const fetchLayouts = async () => {
@@ -32,13 +36,15 @@ const LayoutPage: React.FC = () => {
 				const errorMessage =
 					error.response?.data?.message || 'Failed to fetch layouts. Please check your network connection or server status.';
 				toast(errorMessage, 'error');
-			}
+			} finally {
+                setLoading(false);
+            }
 		};
 		fetchLayouts();
 	}, []);
 
 	const handleAddNewLayout = () => {
-		navigate('/admin/layout/details', { state: { layout: { id: 0 }, layouts } });
+		navigateWithLoading('/admin/layout/details', { state: { layout: { id: 0 }, layouts } });
 	};
 
 	const columns: GridColDef[] = [
@@ -52,7 +58,7 @@ const LayoutPage: React.FC = () => {
 			disableColumnMenu: true,
 			renderCell: (params) => (
 				<IconButton
-					onClick={() => navigate(`/admin/layout/details`, { state: { layout: params.row, layouts } })} // Pass layouts to LayoutDetails
+					onClick={() => navigateWithLoading(`/admin/layout/details`, { state: { layout: params.row, layouts } })} // Pass layouts to LayoutDetails
 					style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', paddingBottom: '1rem' }}
 				>
 					<EditIcon />

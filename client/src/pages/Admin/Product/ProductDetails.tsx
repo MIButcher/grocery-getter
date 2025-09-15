@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { useToast } from '@context/toastContext';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { Product } from '@models/Product';
 import { ProductApi } from '@apis/ProductApi';
@@ -11,9 +14,14 @@ import styles from '../AdminView.module.scss';
 const ProductDetails: React.FC = () => {
 	const toast = useToast()
 	const location = useLocation();
-	const navigate = useNavigate();
 	const initialProduct = location.state?.product as Product;
 	const [product, setProduct] = useState<Product>(initialProduct);
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
+
+	useEffect(() => {
+		setLoading(false);
+    }, []);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -29,7 +37,7 @@ const ProductDetails: React.FC = () => {
                 new Configuration({ basePath: API_BASE_PATH})
             );
 			await productApi.saveProduct({product});
-            navigate('/admin/products');
+            navigateWithLoading('/admin/products');
 			toast('Product saved successfully!', 'success');
 		} catch (error) {
 			console.error('Failed to save product:', error);
@@ -56,7 +64,7 @@ const ProductDetails: React.FC = () => {
                     <Button variant="outlined" onClick={handleSave} className="save-button">
                         Save
                     </Button>
-                    <Button variant="outlined" onClick={() => navigate('/admin/products')} className="cancel-button">
+                    <Button variant="outlined" onClick={() => navigateWithLoading('/admin/products')} className="cancel-button">
                         Cancel
                     </Button>
                 </div>

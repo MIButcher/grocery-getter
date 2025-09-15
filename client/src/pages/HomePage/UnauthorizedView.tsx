@@ -1,8 +1,8 @@
 import { Button, Typography, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 
 export default function UnauthorizedView() {
-  const navigate = useNavigate();
+	const navigateWithLoading = useNavigateWithLoading();
 
   return (
     <Box
@@ -24,7 +24,7 @@ export default function UnauthorizedView() {
       <Typography variant="body1" sx={{ maxWidth: 400, marginBottom: 3 }}>
         You don’t have permission to view this page. Please check your access level or return to a safe location.
       </Typography>
-      <Button variant="contained" onClick={() => navigate('/user')}>
+      <Button variant="contained" onClick={() => navigateWithLoading('/user')}>
         Go to Home
       </Button>
     </Box>

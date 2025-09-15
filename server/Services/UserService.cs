@@ -85,9 +85,8 @@ namespace GroceryGetter.Services
 
         public async Task<User> Login(User loginUser)
         {
-            var users = await _context.User.ToListAsync();
-            var matchedUser = users.FirstOrDefault(u =>
-                u.Email.ToLower() == loginUser.Email.ToLower());
+            var matchedUser = await _context.User
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == loginUser.Email.ToLower());
             var passwordVerified = BCrypt.Net.BCrypt.Verify(loginUser.Password, matchedUser.Password);
 
             if (matchedUser == null || !passwordVerified)

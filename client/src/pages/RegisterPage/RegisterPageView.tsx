@@ -1,21 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useToast } from '@context/toastContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { User } from '@models/User';
 import { UserApi } from '@apis/UserApi';
 import { Configuration } from '@generated/runtime';
 import { useSetAtom } from 'jotai';
-import { userAtom } from '@utilities/atoms';
+import { userAtom, globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import API_BASE_PATH from '@config/apiConfig';
 import styles from '../PagesView.module.scss';
 
 const RegisterPage: React.FC = () => {
 	const toast = useToast()
-	const navigate = useNavigate();
     const [user, setUser] = useState<User>({} as User);
     const [confirmPassword, setConfirmPassword] = useState('');
 	const setUserAtom = useSetAtom(userAtom);
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
+
+	useEffect(() => {
+		setLoading(false);
+    }, []);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -37,7 +43,7 @@ const RegisterPage: React.FC = () => {
             );
 			const savedUser = await userApi.saveUser({ user });
             setUserAtom(savedUser);
-            navigate('/user', { state: { user: savedUser } });
+            navigateWithLoading('/user', { state: { user: savedUser } });
 			toast('User saved successfully!', 'success');
 		} catch (error) {
 			console.error('Failed to save user:', error);

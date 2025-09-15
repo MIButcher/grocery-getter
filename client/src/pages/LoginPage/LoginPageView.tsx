@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
 import { useSetUserAndNavigate } from '@hooks/UseSetUserAndNavigate';
 import { useToast } from '@context/toastContext';
 import { Link } from 'react-router-dom';
@@ -12,11 +14,13 @@ const LoginPage: React.FC = () => {
 	const toast = useToast()
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const setLoading = useSetAtom(globalLoadingAtom);
     const setUserAndNavigate = useSetUserAndNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 		try {
+            setLoading(true);
             const userApi = new UserApi(
                 new Configuration({ basePath: API_BASE_PATH})
             );

@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { useToast } from '@context/toastContext';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
@@ -11,9 +14,14 @@ import styles from '../AdminView.module.scss';
 const AisleDetails: React.FC = () => {
 	const toast = useToast()
 	const location = useLocation();
-	const navigate = useNavigate();
 	const initialAisle = location.state?.aisle as Aisle;
 	const [aisle, setAisle] = useState<Aisle>(initialAisle);
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
+
+	useEffect(() => {
+		setLoading(false);
+    }, []);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -29,7 +37,7 @@ const AisleDetails: React.FC = () => {
                 new Configuration({ basePath: API_BASE_PATH })
             );
 			await aisleApi.saveAisle({aisle});
-            navigate('/admin/aisles');
+            navigateWithLoading('/admin/aisles');
 			toast('Aisle saved successfully!', 'success');
 		} catch (error) {
 			console.error('Failed to save aisle:', error);
@@ -69,7 +77,7 @@ const AisleDetails: React.FC = () => {
                     <Button variant="outlined" onClick={handleSave} className="save-button">
                         Save
                     </Button>
-                    <Button variant="outlined" onClick={() => navigate('/admin/aisles')} className="cancel-button">
+                    <Button variant="outlined" onClick={() => navigateWithLoading('/admin/aisles')} className="cancel-button">
                         Cancel
                     </Button>
                 </div>

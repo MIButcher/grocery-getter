@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { Button, IconButton } from "@mui/material";
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { UserApi } from '@apis/UserApi';
 import { User } from '@models/User';
@@ -13,7 +16,8 @@ import styles from '../AdminView.module.scss';
 const UserPage: React.FC = () => {
 	const toast = useToast()
 	const [users, setUsers] = useState<User[]>([]);
-	const navigate = useNavigate();
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
 
 	useEffect(() => {
 		const fetchUsers = async () => {
@@ -32,6 +36,8 @@ const UserPage: React.FC = () => {
 				const errorMessage =
 					error.response?.data?.message || 'Failed to fetch users. Please check your network connection or server status.';
 				toast(errorMessage, 'error');
+			} finally {
+				setLoading(false);
 			}
 		};
 		fetchUsers();
@@ -47,7 +53,7 @@ const UserPage: React.FC = () => {
 			disableColumnMenu: true,
 			renderCell: (params) => (
 				<IconButton
-					onClick={() => navigate(`/admin/user/details`, { state: { user: params.row } })}
+					onClick={() => navigateWithLoading(`/admin/user/details`, { state: { user: params.row } })}
 					style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', paddingBottom: '1rem' }}
 				>
 					<EditIcon />
