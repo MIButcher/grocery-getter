@@ -130,9 +130,16 @@ const UserProductPage: React.FC = () => {
 	const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
 		e.preventDefault();
 
-		const pastedText = e.clipboardData.getData('text');
+		let pastedText = e.clipboardData.getData('text');
+
+		// Normalize weird spacing and line breaks
+		pastedText = pastedText
+			.replace(/\u00A0/g, ' ') // non-breaking space
+			.replace(/\u200B/g, '')  // zero-width space
+			.replace(/\r\n|\r|\n/g, '\n') // normalize all line breaks to \n
+
 		const transformed = pastedText
-			.split(/\r?\n|\r|\u2028|\u2029|,/) // handles CRLF, CR, LF, Unicode line separators, and commas
+			.split(/[\n,\u2028\u2029]/) // split on normalized line breaks, commas, and unicode separators
 			.map(s => s.trim())
 			.filter(Boolean)
 			.join(', ');
