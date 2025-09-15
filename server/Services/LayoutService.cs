@@ -53,7 +53,27 @@ namespace GroceryGetter.Services
             }
             else
             {
-                _context.Layout.Add(layout);
+                // Only one active layout per store—deactivate others
+                if (layout.IsActive)
+                {
+                    var activeLayouts = await _context.Layout
+                        .Where(l => l.StoreId == layout.StoreId && l.IsActive)
+                        .ToListAsync();
+
+                    foreach (var l in activeLayouts)
+                    {
+                        l.IsActive = false;
+                    }
+                }
+
+                var layoutToAdd = new Layout
+                {
+                    StoreId = layout.StoreId,
+                    Name = layout.Name,
+                    IsActive = layout.IsActive,
+                };
+
+                _context.Layout.Add(layoutToAdd);
             }
 
             await _context.SaveChangesAsync();

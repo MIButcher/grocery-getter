@@ -121,15 +121,15 @@ const UserProductPage: React.FC = () => {
 
 		const pastedText = e.clipboardData.getData('text');
 		const transformed = pastedText
-		.split(/[\n\r,]+/) // split on newlines or commas
-		.map(s => s.trim())
-		.filter(Boolean)
-		.join(', ');
+			.split(/\r?\n|\r|\u2028|\u2029|,/) // handles CRLF, CR, LF, Unicode line separators, and commas
+			.map(s => s.trim())
+			.filter(Boolean)
+			.join(', ');
 
 		const input = e.target as HTMLInputElement;
 		const cursorPos = input.selectionStart ?? typedList.length;
 		const newValue =
-		typedList.slice(0, cursorPos) + transformed + typedList.slice(cursorPos);
+			typedList.slice(0, cursorPos) + transformed + typedList.slice(cursorPos);
 
 		setTypedList(newValue);
 		handleAddUserProducts(newValue);
