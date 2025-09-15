@@ -26,6 +26,7 @@ const ProductPage: React.FC = () => {
 	useEffect(() => {
 		const fetchProducts = async () => {
 			try {
+				setLoading(true);
 				const productApi = new ProductApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);

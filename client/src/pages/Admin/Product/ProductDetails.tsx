@@ -33,6 +33,7 @@ const ProductDetails: React.FC = () => {
 
 	const handleSave = async () => {
 		try {
+			setLoading(true);
             const productApi = new ProductApi(
                 new Configuration({ basePath: API_BASE_PATH})
             );
@@ -42,6 +43,8 @@ const ProductDetails: React.FC = () => {
 		} catch (error) {
 			console.error('Failed to save product:', error);
 			toast('Failed to save product. Please try again.', 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 

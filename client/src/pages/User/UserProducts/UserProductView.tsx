@@ -83,6 +83,7 @@ const UserProductPage: React.FC = () => {
 		};
 
 		const loadAll = async () => {
+			setLoading(true);
 			await Promise.all([
 				fetchUserProducts(),
 				fetchProducts(),
@@ -156,6 +157,7 @@ const UserProductPage: React.FC = () => {
 
 		const addUserProducts = async () => {
 			try {
+				setLoading(true);
 				const userProductApi = new UserProductApi(
 					new Configuration({ basePath: API_BASE_PATH })
 				);
@@ -173,6 +175,8 @@ const UserProductPage: React.FC = () => {
 				const errorMessage =
 					error.response?.data?.message || 'Failed to add products. Please check your network connection or server status.';
 				toast(errorMessage, 'error');
+			} finally {
+				setLoading(false);
 			}
 		};
 		addUserProducts();
@@ -212,6 +216,7 @@ const UserProductPage: React.FC = () => {
 
 	const handleUserProductInCart = async (groceryListItem: GroceryListItem) => {
 		try {
+			setLoading(true);
 			const userProductApi = new UserProductApi(
 				new Configuration({ basePath: API_BASE_PATH })
 			);
@@ -231,11 +236,14 @@ const UserProductPage: React.FC = () => {
 			const errorMessage =
 				error.response?.data?.message || 'Failed to add product to cart. Please check your network connection or server status.';
 			toast(errorMessage, 'error');
+		} finally {
+			setLoading(false);
 		}
 	}
 
 	const handleDeleteUserProduct = async (userProductId: number) => {
 		try {
+			setLoading(true);
 			const userProductApi = new UserProductApi(
 				new Configuration({ basePath: API_BASE_PATH })
 			);
@@ -254,11 +262,14 @@ const UserProductPage: React.FC = () => {
 			const errorMessage =
 				error.response?.data?.message || 'Failed to delete product. Please check your network connection or server status.';
 			toast(errorMessage, 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 
 	const handleAddFavorites = async () => {
 		try {
+			setLoading(true);
 			const userProductApi = new UserProductApi(
 				new Configuration({ basePath: API_BASE_PATH })
 			);
@@ -280,11 +291,14 @@ const UserProductPage: React.FC = () => {
 			const errorMessage =
 				error.response?.data?.message || 'Failed to add favorite products. Please check your network connection or server status.';
 			toast(errorMessage, 'error');
+		} finally {
+			setLoading(false);
 		}
 	}
 
 	const handleShareList = async (emailString: string) => {
 		try {
+			setLoading(true);
 			const userApi = new UserApi(
 				new Configuration({ basePath: API_BASE_PATH })
 			);
@@ -300,6 +314,8 @@ const UserProductPage: React.FC = () => {
 			const errorMessage =
 				error.response?.data?.message || 'Failed to update User Share List.';
 			toast(errorMessage, 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 

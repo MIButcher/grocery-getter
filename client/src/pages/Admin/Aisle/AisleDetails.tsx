@@ -33,6 +33,7 @@ const AisleDetails: React.FC = () => {
 
 	const handleSave = async () => {
 		try {
+			setLoading(true);
             const aisleApi = new AisleApi(
                 new Configuration({ basePath: API_BASE_PATH })
             );
@@ -42,6 +43,8 @@ const AisleDetails: React.FC = () => {
 		} catch (error) {
 			console.error('Failed to save aisle:', error);
 			toast('Failed to save aisle. Please try again.', 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 

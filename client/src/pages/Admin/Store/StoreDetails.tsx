@@ -33,6 +33,7 @@ const StoreDetails: React.FC = () => {
 
 	const handleSave = async () => {
 		try {
+			setLoading(true);
             const storeApi = new StoreApi(
                 new Configuration({ basePath: API_BASE_PATH})
             );
@@ -42,6 +43,8 @@ const StoreDetails: React.FC = () => {
 		} catch (error) {
 			console.error('Failed to save store:', error);
 			toast('Failed to save store. Please try again.', 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 

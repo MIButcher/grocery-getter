@@ -34,6 +34,8 @@ const LoginPage: React.FC = () => {
                 console.error('Unexpected error:', error);
 				toast('An unexpected error occurred. Please try again later.', 'error');
             }
+        } finally {
+            setLoading(false);
         }
     };
 

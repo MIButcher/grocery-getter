@@ -27,6 +27,7 @@ const LayoutDetails: React.FC = () => {
 	useEffect(() => {
 		const fetchStores = async () => {
 			try {
+				setLoading(true);
 				const storeApi = new StoreApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);
@@ -77,6 +78,7 @@ const LayoutDetails: React.FC = () => {
 
 	const handleSave = async () => {
 		try {
+			setLoading(true);
             const layoutApi = new LayoutApi(
                 new Configuration({ basePath: API_BASE_PATH})
             );
@@ -86,6 +88,8 @@ const LayoutDetails: React.FC = () => {
 		} catch (error) {
 			console.error('Failed to save layout:', error);
 			toast('Failed to save layout. Please try again.', 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 

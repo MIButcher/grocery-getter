@@ -33,6 +33,7 @@ const UserDetails: React.FC = () => {
 
 	const handleSave = async () => {
 		try {
+			setLoading(true);
             const userApi = new UserApi(
                 new Configuration({ basePath: API_BASE_PATH})
             );
@@ -42,6 +43,8 @@ const UserDetails: React.FC = () => {
 		} catch (error) {
 			console.error('Failed to save user:', error);
 			toast('Failed to save user. Please try again.', 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 

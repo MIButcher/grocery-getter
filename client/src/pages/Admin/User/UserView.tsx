@@ -22,6 +22,7 @@ const UserPage: React.FC = () => {
 	useEffect(() => {
 		const fetchUsers = async () => {
 			try {
+				setLoading(true);
 				const userApi = new UserApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);

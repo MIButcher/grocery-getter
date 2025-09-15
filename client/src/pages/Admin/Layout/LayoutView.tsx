@@ -22,6 +22,7 @@ const LayoutPage: React.FC = () => {
 	useEffect(() => {
 		const fetchLayouts = async () => {
 			try {
+				setLoading(true);
 				const layoutApi = new LayoutApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);

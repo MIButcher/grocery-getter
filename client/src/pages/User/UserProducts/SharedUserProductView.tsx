@@ -31,6 +31,7 @@ const SharedUserProductPage: React.FC = () => {
 	useEffect(() => {
 		const fetchUserProducts = async () => {
 			try {
+				setLoading(true);
 				const userProductApi = new UserProductApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);
@@ -55,6 +56,7 @@ const SharedUserProductPage: React.FC = () => {
 	const handleMergeUserProducts = (e: GroceryListItem[] | undefined) => {
 		const mergeUserProducts = async () => {
 			try {
+				setLoading(true);
 				const userProductApi = new UserProductApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);
@@ -76,6 +78,8 @@ const SharedUserProductPage: React.FC = () => {
 				const errorMessage =
 					error.response?.data?.message || 'Failed to add products. Please check your network connection or server status.';
 				toast(errorMessage, 'error');
+			} finally {
+				setLoading(false);
 			}
 		};
 		mergeUserProducts();

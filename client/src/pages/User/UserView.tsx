@@ -25,6 +25,7 @@ const UserView: React.FC = () => {
 	useEffect(() => {
 		const fetchIdNameLinks = async () => {
 			try {
+				setLoading(true);
 				const userApi = new UserApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);
@@ -51,6 +52,7 @@ const UserView: React.FC = () => {
 
 	const deleteGroceryList = async () => {
 		try {
+			setLoading(true);
 			const userProductApi = new UserProductApi(
 				new Configuration({ basePath: API_BASE_PATH})
 			);
@@ -62,6 +64,8 @@ const UserView: React.FC = () => {
 			const errorMessage =
 				error.response?.data?.message || 'Failed to delete products. Please try again later.';
 			toast(errorMessage, 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 	

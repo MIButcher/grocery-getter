@@ -22,6 +22,7 @@ const StorePage: React.FC = () => {
 	useEffect(() => {
 		const fetchStores = async () => {
 			try {
+				setLoading(true);
 				const storeApi = new StoreApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);

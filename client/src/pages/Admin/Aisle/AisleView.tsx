@@ -31,6 +31,7 @@ const AislePage: React.FC = () => {
     useEffect(() => {
         const fetchStoreLayoutAisleData = async () => {
             try {
+				setLoading(true);
                 const storeApi = new StoreApi(new Configuration({ basePath: API_BASE_PATH }));
                 const response = await storeApi.getStoreLayoutAisleData({ isActiveLayout: false });
 
@@ -111,6 +112,7 @@ const AislePage: React.FC = () => {
 	const handleMove = async (aisle: Aisle, lineupChange: number) => {
 		try {
 			if (aisle.lineup) {
+				setLoading(true);
 				aisle.lineup = aisle.lineup + lineupChange;
 				setAisleLayout(aisle);
 				const aisleApi = new AisleApi(
@@ -122,6 +124,8 @@ const AislePage: React.FC = () => {
 		} catch (error) {
 			console.error('Failed to save aisle:', error);
 			toast('Failed to save aisle. Please try again.', 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 
