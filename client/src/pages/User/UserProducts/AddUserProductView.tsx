@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { useAtom } from 'jotai';
-import { userAtom } from '@utilities/atoms';
+import { useLocation, Link } from 'react-router-dom';
+import { useAtom, useSetAtom } from 'jotai';
+import { globalLoadingAtom, userAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { Button, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { Product } from '@models/Product';
 import { UserProductApi } from '@apis/UserProductApi';
@@ -18,7 +19,6 @@ import styles from '../UserView.module.scss';
 const AddUserProductView: React.FC = () => {
 	const toast = useToast()
 	const location = useLocation();
-	const navigate = useNavigate();
 	const [user] = useAtom(userAtom);
 	const initialProduct = location.state?.product as Product;
     const initialStoreId = location.state?.storeId as number;
@@ -32,10 +32,13 @@ const AddUserProductView: React.FC = () => {
     const [storeAisles, setStoreAisles] = useState<string[]>([]);
     const [fullUserProduct, setFullUserProduct] = useState<FullUserProductRequest>
         ({ userId: user?.id, currentStoreId: initialStoreId, productName: initialProduct.name, quantity: 1, inCart: false, isVerified: false, aisleIds: [] });
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
     
     useEffect(() => {
         const fetchStoreLayoutAisleData = async () => {
             try {
+                setLoading(true);
                 const storeApi = new StoreApi(
                     new Configuration({ basePath: API_BASE_PATH})
                 );
@@ -54,6 +57,8 @@ const AddUserProductView: React.FC = () => {
                 const errorMessage =
                     error.response?.data?.message || 'Failed to fetch store layout aisle data. Please check your network connection or server status.';
 				toast(errorMessage, 'error');
+            } finally {
+                setLoading(false);
             }
         }
         fetchStoreLayoutAisleData();
@@ -125,17 +130,20 @@ const AddUserProductView: React.FC = () => {
 
 	const handleSave = async () => {
         try {
+            setLoading(true);
             const userProductApi = new UserProductApi(
                 new Configuration({ basePath: API_BASE_PATH})
             );
             await userProductApi.addUserProduct({ fullUserProductRequest: fullUserProduct });
-            navigate('/userproducts', {
+            navigateWithLoading('/userproducts', {
                 state: { unhandledTypedList: unhandledProductsList }
             });
             toast('Product saved successfully!', 'success');
         } catch (error) {
             console.error('Failed to save product:', error);
             toast('Failed to save product. Please try again.', 'error');
+        } finally {
+            setLoading(false);
         }
 	};
 
@@ -143,7 +151,7 @@ const AddUserProductView: React.FC = () => {
         const unhandledTypedList = unhandledProductsList && unhandledProductsList.trim()
             ? `${fullUserProduct.productName},${unhandledProductsList}`
             : fullUserProduct.productName;
-            navigate('/userproducts', {
+            navigateWithLoading('/userproducts', {
                 state: { unhandledTypedList }
             });
     }

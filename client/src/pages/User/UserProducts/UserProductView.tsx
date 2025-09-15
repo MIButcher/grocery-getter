@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useToast } from '@context/toastContext';
 import { useAtom, useSetAtom } from 'jotai';
-import { displayModeAtom, editModeAtom, userAtom } from '@utilities/atoms';
+import { displayModeAtom, editModeAtom, globalLoadingAtom, userAtom } from '@utilities/atoms';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { ProductApi } from '@apis/ProductApi';
 import { Product } from '@models/Product';
@@ -14,6 +14,7 @@ import { GroceryListItem } from '@models/GroceryListItem';
 import { Configuration } from '@generated/runtime';
 import { AddShoppingCartIcon, FormatSizeSharpIcon, HighlightOffIcon, RemoveShoppingCartIcon, SearchIcon } from '@imports/MaterialUIIcons';
 import { sendSMS } from '@utilities/sendSMS';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import API_BASE_PATH from '@config/apiConfig';
 import styles from '../UserView.module.scss';
 
@@ -35,7 +36,8 @@ const UserProductPage: React.FC = () => {
   	const [displayMode, setDisplayMode] = useAtom(displayModeAtom);
 	const rowHeight = displayMode === 2 ? 32 : 64;
 	const fontSize = displayMode === 1 ? '1.25rem' : '0.875rem';
-	const navigate = useNavigate();
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
 
 	useEffect(() => {
 		const fetchUserProducts = async () => {
@@ -79,10 +81,19 @@ const UserProductPage: React.FC = () => {
 				checkForMatch(typedList);
 			}
 		};
-		fetchUserProducts();
-		fetchProducts();
-		checkTypedList();
-	}, [user, navigate]);
+
+		const loadAll = async () => {
+			setLoading(true);
+			await Promise.all([
+				fetchUserProducts(),
+				fetchProducts(),
+				checkTypedList()
+			]);
+			setLoading(false);
+		};
+
+		loadAll();
+	}, [user]);
 
 	const checkForMatch = (e: string) => {
 		const userInput = e;
@@ -121,15 +132,15 @@ const UserProductPage: React.FC = () => {
 
 		const pastedText = e.clipboardData.getData('text');
 		const transformed = pastedText
-		.split(/[\n\r,]+/) // split on newlines or commas
-		.map(s => s.trim())
-		.filter(Boolean)
-		.join(', ');
+			.split(/\r?\n|\r|\u2028|\u2029|,/) // handles CRLF, CR, LF, Unicode line separators, and commas
+			.map(s => s.trim())
+			.filter(Boolean)
+			.join(', ');
 
 		const input = e.target as HTMLInputElement;
 		const cursorPos = input.selectionStart ?? typedList.length;
 		const newValue =
-		typedList.slice(0, cursorPos) + transformed + typedList.slice(cursorPos);
+			typedList.slice(0, cursorPos) + transformed + typedList.slice(cursorPos);
 
 		setTypedList(newValue);
 		handleAddUserProducts(newValue);
@@ -146,6 +157,7 @@ const UserProductPage: React.FC = () => {
 
 		const addUserProducts = async () => {
 			try {
+				setLoading(true);
 				const userProductApi = new UserProductApi(
 					new Configuration({ basePath: API_BASE_PATH })
 				);
@@ -163,6 +175,8 @@ const UserProductPage: React.FC = () => {
 				const errorMessage =
 					error.response?.data?.message || 'Failed to add products. Please check your network connection or server status.';
 				toast(errorMessage, 'error');
+			} finally {
+				setLoading(false);
 			}
 		};
 		addUserProducts();
@@ -175,7 +189,7 @@ const UserProductPage: React.FC = () => {
 				.map(word => word.charAt(0).toUpperCase() + word.slice(1))
 				.join(' ');
 
-			navigate(`/userproducts/add`, {
+			navigateWithLoading(`/userproducts/add`, {
 				state: { product: { name, id: 0 }, storeId: storeId, unhandledProductsList }
 			});
 		} catch (error) {
@@ -188,7 +202,7 @@ const UserProductPage: React.FC = () => {
 		try {
 			const initialGroceryListItem = groceryList.find(p => p.userProductId === groceryListItem.userProductId);
 			if (initialGroceryListItem) {
-				navigate(`/userproducts/details`, {
+				navigateWithLoading(`/userproducts/details`, {
 					state: { initialGroceryListItem }
 				});
 			} else {
@@ -202,6 +216,7 @@ const UserProductPage: React.FC = () => {
 
 	const handleUserProductInCart = async (groceryListItem: GroceryListItem) => {
 		try {
+			setLoading(true);
 			const userProductApi = new UserProductApi(
 				new Configuration({ basePath: API_BASE_PATH })
 			);
@@ -221,11 +236,14 @@ const UserProductPage: React.FC = () => {
 			const errorMessage =
 				error.response?.data?.message || 'Failed to add product to cart. Please check your network connection or server status.';
 			toast(errorMessage, 'error');
+		} finally {
+			setLoading(false);
 		}
 	}
 
 	const handleDeleteUserProduct = async (userProductId: number) => {
 		try {
+			setLoading(true);
 			const userProductApi = new UserProductApi(
 				new Configuration({ basePath: API_BASE_PATH })
 			);
@@ -244,11 +262,14 @@ const UserProductPage: React.FC = () => {
 			const errorMessage =
 				error.response?.data?.message || 'Failed to delete product. Please check your network connection or server status.';
 			toast(errorMessage, 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 
 	const handleAddFavorites = async () => {
 		try {
+			setLoading(true);
 			const userProductApi = new UserProductApi(
 				new Configuration({ basePath: API_BASE_PATH })
 			);
@@ -270,11 +291,14 @@ const UserProductPage: React.FC = () => {
 			const errorMessage =
 				error.response?.data?.message || 'Failed to add favorite products. Please check your network connection or server status.';
 			toast(errorMessage, 'error');
+		} finally {
+			setLoading(false);
 		}
 	}
 
 	const handleShareList = async (emailString: string) => {
 		try {
+			setLoading(true);
 			const userApi = new UserApi(
 				new Configuration({ basePath: API_BASE_PATH })
 			);
@@ -290,6 +314,8 @@ const UserProductPage: React.FC = () => {
 			const errorMessage =
 				error.response?.data?.message || 'Failed to update User Share List.';
 			toast(errorMessage, 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 

@@ -93,7 +93,18 @@ namespace GroceryGetter.Services
             }
             else
             {
-                _context.UserProduct.Add(userProduct);
+                var userProductToAdd = new UserProduct
+                {
+                    UserId = userProduct.UserId,
+                    ProductId = userProduct.ProductId,
+                    InCart = userProduct.InCart,
+                    Quantity = userProduct.Quantity,
+                    Notes = userProduct.Notes,
+                    IsFavorite = userProduct.IsFavorite,
+                    IsHidden = userProduct.IsHidden
+                };
+
+                _context.UserProduct.Add(userProductToAdd);
             }
 
             await _context.SaveChangesAsync();

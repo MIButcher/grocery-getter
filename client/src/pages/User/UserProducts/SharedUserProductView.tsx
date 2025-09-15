@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { useToast } from '@context/toastContext';
 import { useAtom } from 'jotai';
 import { sharerIdAtom, userAtom } from '@utilities/atoms';
 import { Button, IconButton } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { UserProductApi } from '@apis/UserProductApi';
 import { GroceryListItem } from '@models/GroceryListItem';
@@ -21,12 +24,14 @@ const SharedUserProductPage: React.FC = () => {
 	const [storeId] = useState<number>(1);
 	const [user] = useAtom(userAtom);
 	const [sharerId] = useAtom(sharerIdAtom);
-	const navigate = useNavigate();
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
 	const typedList = '';
 
 	useEffect(() => {
 		const fetchUserProducts = async () => {
 			try {
+				setLoading(true);
 				const userProductApi = new UserProductApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);
@@ -41,14 +46,17 @@ const SharedUserProductPage: React.FC = () => {
 				const errorMessage =
 					error.response?.data?.message || 'Failed to fetch products. Please check your network connection or server status.';
 				toast(errorMessage, 'error');
+			} finally {
+				setLoading(false);
 			}
 		};
 		fetchUserProducts();
-	}, [user, navigate]);
+	}, [user, navigateWithLoading, sharerId, setLoading, toast]);
 
 	const handleMergeUserProducts = (e: GroceryListItem[] | undefined) => {
 		const mergeUserProducts = async () => {
 			try {
+				setLoading(true);
 				const userProductApi = new UserProductApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);
@@ -62,7 +70,7 @@ const SharedUserProductPage: React.FC = () => {
 					...groceryListItem,
 					id: groceryListItem.userProductId,
 				})) ?? [];
-				navigate(`/userProducts/shared`, { state: { sharerId: sharerId } })
+				navigateWithLoading(`/userProducts/shared`, { state: { sharerId: sharerId } })
 				setMergedList([...mergedList, ...itemsToMerge]);
 				toast('The shared list has been merged.', 'success');
 			} catch (error: any) {
@@ -70,6 +78,8 @@ const SharedUserProductPage: React.FC = () => {
 				const errorMessage =
 					error.response?.data?.message || 'Failed to add products. Please check your network connection or server status.';
 				toast(errorMessage, 'error');
+			} finally {
+				setLoading(false);
 			}
 		};
 		mergeUserProducts();

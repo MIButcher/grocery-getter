@@ -125,7 +125,14 @@ namespace GroceryGetter.Services
             }
             else
             {
-                _context.AisleProduct.Add(aisleProduct);
+                var aisleProductToAdd = new AisleProduct
+                {
+                    ProductId = aisleProduct.ProductId,
+                    AisleId = aisleProduct.AisleId,
+                    IsVerified = aisleProduct.IsVerified,
+                    Lineup = aisleProduct.Lineup
+                };
+                _context.AisleProduct.Add(aisleProductToAdd);
             }
 
             await _context.SaveChangesAsync();

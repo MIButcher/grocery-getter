@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { useToast } from '@context/toastContext';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { User } from '@models/User';
 import { UserApi } from '@apis/UserApi';
@@ -11,9 +14,14 @@ import styles from '../AdminView.module.scss';
 const UserDetails: React.FC = () => {
 	const toast = useToast()
 	const location = useLocation();
-	const navigate = useNavigate();
 	const initialUser = location.state?.user as User;
 	const [user, setUser] = useState<User>(initialUser);
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
+
+	useEffect(() => {
+		setLoading(false);
+    }, []);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -25,15 +33,18 @@ const UserDetails: React.FC = () => {
 
 	const handleSave = async () => {
 		try {
+			setLoading(true);
             const userApi = new UserApi(
                 new Configuration({ basePath: API_BASE_PATH})
             );
 			await userApi.saveUser({user});
-            navigate('/admin/users');
+            navigateWithLoading('/admin/users');
 			toast('User saved successfully!', 'success');
 		} catch (error) {
 			console.error('Failed to save user:', error);
 			toast('Failed to save user. Please try again.', 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -83,7 +94,7 @@ const UserDetails: React.FC = () => {
                     <Button variant="outlined" onClick={handleSave} className="save-button">
                         Save
                     </Button>
-                    <Button variant="outlined" onClick={() => navigate('/admin/users')} className="cancel-button">
+                    <Button variant="outlined" onClick={() => navigateWithLoading('/admin/users')} className="cancel-button">
                         Cancel
                     </Button>
                 </div>

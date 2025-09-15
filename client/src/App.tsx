@@ -10,7 +10,8 @@ import AppRoutes from "./AppRoutes";
 import { CardLinedHeader } from "@imports/CommonComponents";
 import { Button, IconButton, Menu, MenuItem } from "@mui/material";
 import { ContrastIcon, DarkModeIcon, EditIcon, ShoppingCartIcon } from "@imports/MaterialUIIcons";
-import { editModeAtom, userAtom } from '@utilities/atoms';
+import { editModeAtom, globalLoadingAtom, userAtom } from '@utilities/atoms';
+import GlobalSpinner from '@components/GlobalSpinner';
 const darkModeAtom = atomWithStorage("darkMode", false);
 
 const createCustomTheme = (themeOptions: any, cssVariables: any) => ({
@@ -29,6 +30,7 @@ function App() {
   const [darkMode, setdarkMode] = useAtom(darkModeAtom);
 	const setUserAtom = useSetAtom(userAtom);
   const [user] = useAtom(userAtom);
+  const [loading] = useAtom(globalLoadingAtom);
   const theme = darkMode ? themeDefault : themeDark;
   const userName = user?.firstName && user?.lastName ? user.firstName.charAt(0) + user.lastName : "";
 
@@ -97,6 +99,7 @@ function App() {
             </IconButton>
           </div>
         </CardLinedHeader>
+        {loading && <GlobalSpinner />}
       <AppRoutes />
     </ThemeProvider>
   );

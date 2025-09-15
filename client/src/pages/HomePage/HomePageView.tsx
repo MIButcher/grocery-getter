@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import styles from './HomePageView.module.scss';
 
 
 const HomePage: React.FC = () => {
-  const navigate = useNavigate();
+	const navigateWithLoading = useNavigateWithLoading();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate('/login');
+      navigateWithLoading('/login');
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigateWithLoading]);
 
     return (
 		<div className={styles.mainContainer}>

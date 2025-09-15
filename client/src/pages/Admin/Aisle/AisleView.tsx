@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
 import { Button, IconButton, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { StoreApi } from '@apis/StoreApi';
 import { Store } from '@models/Store';
@@ -8,8 +10,9 @@ import { Layout } from '@models/Layout';
 import { AisleApi } from '@apis/AisleApi';
 import { Aisle } from '@models/Aisle';
 import { Configuration } from '@generated/runtime';
-import { ArrowDownwardIcon, ArrowUpwardIcon, EditIcon } from '@imports/MaterialUIIcons';
+import { ArrowDownwardIcon, ArrowUpwardIcon } from '@imports/MaterialUIIcons';
 import { useToast } from '@context/toastContext';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import API_BASE_PATH from '@config/apiConfig';
 import styles from '../AdminView.module.scss';
 
@@ -22,11 +25,13 @@ const AislePage: React.FC = () => {
     const [storeLayouts, setStoreLayouts] = useState<Layout[]>([]);
 	const [aisles, setAisles] = useState<Aisle[]>([]);
     const [layoutAisles, setLayoutAisles] = useState<Aisle[]>([]);
-	const navigate = useNavigate();
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
 
     useEffect(() => {
         const fetchStoreLayoutAisleData = async () => {
             try {
+				setLoading(true);
                 const storeApi = new StoreApi(new Configuration({ basePath: API_BASE_PATH }));
                 const response = await storeApi.getStoreLayoutAisleData({ isActiveLayout: false });
 
@@ -62,6 +67,8 @@ const AislePage: React.FC = () => {
                 const errorMessage =
                     error.response?.data?.message || 'Failed to fetch store layout aisle data. Please check your network connection or server status.';
                 toast(errorMessage, 'error');
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -99,12 +106,13 @@ const AislePage: React.FC = () => {
     };
 
 	const handleAddNewAisle = () => {
-		navigate('/admin/aisle/details', { state: { aisle: { id: 0, layoutId: layout?.id, layout } } });
+		navigateWithLoading('/admin/aisle/details', { state: { aisle: { id: 0, layoutId: layout?.id, layout } } });
 	};
 
 	const handleMove = async (aisle: Aisle, lineupChange: number) => {
 		try {
 			if (aisle.lineup) {
+				setLoading(true);
 				aisle.lineup = aisle.lineup + lineupChange;
 				setAisleLayout(aisle);
 				const aisleApi = new AisleApi(
@@ -116,6 +124,8 @@ const AislePage: React.FC = () => {
 		} catch (error) {
 			console.error('Failed to save aisle:', error);
 			toast('Failed to save aisle. Please try again.', 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -146,12 +156,12 @@ const AislePage: React.FC = () => {
 				setAisleLayout(params.row)
 				return (
 				<span
-				onClick={() => navigate(`/admin/aisle/details`, { state: { aisle: params.row } })}
-				style={{
-					cursor: 'pointer',
-					textDecoration: 'underline',
-					color: 'var(--text-primary)',
-				}}
+					onClick={() => navigateWithLoading(`/admin/aisle/details`, { state: { aisle: params.row } })}
+					style={{
+						cursor: 'pointer',
+						textDecoration: 'underline',
+						color: 'var(--text-primary)',
+					}}
 				>
 				{params.value}
 				</span>

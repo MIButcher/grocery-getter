@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
+import { Link } from 'react-router-dom';
 import { Button, IconButton } from "@mui/material";
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { StoreApi } from '@apis/StoreApi';
@@ -13,11 +16,13 @@ import styles from '../AdminView.module.scss';
 const StorePage: React.FC = () => {
 	const toast = useToast()
 	const [stores, setStores] = useState<Store[]>([]);
-	const navigate = useNavigate();
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
 
 	useEffect(() => {
 		const fetchStores = async () => {
 			try {
+				setLoading(true);
 				const storeApi = new StoreApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);
@@ -32,13 +37,15 @@ const StorePage: React.FC = () => {
 				const errorMessage =
 					error.response?.data?.message || 'Failed to fetch stores. Please check your network connection or server status.';
 				toast(errorMessage, 'error');
+			} finally {
+				setLoading(false);
 			}
 		};
 		fetchStores();
 	}, []);
 
 	const handleAddNewStore = () => {
-		navigate('/admin/store/details', { state: { store: { id: 0 } } });
+		navigateWithLoading('/admin/store/details', { state: { store: { id: 0 } } });
 	};
 
 	const columns: GridColDef[] = [
@@ -51,7 +58,7 @@ const StorePage: React.FC = () => {
 			disableColumnMenu: true,
 			renderCell: (params) => (
 				<IconButton
-					onClick={() => navigate(`/admin/store/details`, { state: { store: params.row } })}
+					onClick={() => navigateWithLoading(`/admin/store/details`, { state: { store: params.row } })}
 					style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', paddingBottom: '1rem' }}
 				>
 					<EditIcon />

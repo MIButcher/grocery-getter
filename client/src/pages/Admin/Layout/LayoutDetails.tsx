@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { useToast } from '@context/toastContext';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { Layout } from '@models/Layout';
 import { LayoutApi } from '@apis/LayoutApi';
@@ -13,16 +16,18 @@ import styles from '../AdminView.module.scss';
 const LayoutDetails: React.FC = () => {
 	const toast = useToast()
 	const location = useLocation();
-	const navigate = useNavigate();
 	const initialLayout = location.state?.layout as Layout;
 	const layouts = location.state?.layouts as Layout[];
 	const [layout, setLayout] = useState<Layout>(initialLayout);
 	const [stores, setStores] = useState<Store[]>([]);
 	const [suggestedName, setSuggestedName] = useState<string>('');
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
 
 	useEffect(() => {
 		const fetchStores = async () => {
 			try {
+				setLoading(true);
 				const storeApi = new StoreApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);
@@ -31,7 +36,9 @@ const LayoutDetails: React.FC = () => {
 			} catch (error) {
 				console.error('Failed to fetch stores:', error);
 				toast('Failed to load stores. Please try again.', 'error');
-			}
+			} finally {
+                setLoading(false);
+            }
 		};
 		fetchStores();
 	}, []);
@@ -46,11 +53,12 @@ const LayoutDetails: React.FC = () => {
 
 	const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const { name, value } = e.target;
+		const store = stores.find(store => store.id === parseInt(value));
 		setLayout((prevLayout) => ({
 			...prevLayout,
 			[name]: value ? parseInt(value) : undefined,
+			store: store || undefined,
 		}));
-		const store = stores.find(store => store.id === parseInt(value));
 		const suggestedName = store ? store.name + '-' + store.city : '';
 		const isNameTaken = layouts.some(existingLayout => existingLayout.name === suggestedName);
 		if (isNameTaken) {
@@ -70,15 +78,18 @@ const LayoutDetails: React.FC = () => {
 
 	const handleSave = async () => {
 		try {
+			setLoading(true);
             const layoutApi = new LayoutApi(
                 new Configuration({ basePath: API_BASE_PATH})
             );
 			await layoutApi.saveLayout({layout});
-            navigate('/admin/layouts');
+            navigateWithLoading('/admin/layouts');
 			toast('Layout saved successfully!', 'success');
 		} catch (error) {
 			console.error('Failed to save layout:', error);
 			toast('Failed to save layout. Please try again.', 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -125,7 +136,7 @@ const LayoutDetails: React.FC = () => {
                     <Button variant="outlined" onClick={handleSave} className="save-button">
                         Save
                     </Button>
-                    <Button variant="outlined" onClick={() => navigate('/admin/layouts')} className="cancel-button">
+                    <Button variant="outlined" onClick={() => navigateWithLoading('/admin/layouts')} className="cancel-button">
                         Cancel
                     </Button>
                 </div>

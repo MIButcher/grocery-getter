@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { useToast } from '@context/toastContext';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { Store } from '@models/Store';
 import { StoreApi } from '@apis/StoreApi';
@@ -11,9 +14,14 @@ import styles from '../AdminView.module.scss';
 const StoreDetails: React.FC = () => {
 	const toast = useToast()
 	const location = useLocation();
-	const navigate = useNavigate();
 	const initialStore = location.state?.store as Store;
 	const [store, setStore] = useState<Store>(initialStore);
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
+
+	useEffect(() => {
+		setLoading(false);
+    }, []);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -25,15 +33,18 @@ const StoreDetails: React.FC = () => {
 
 	const handleSave = async () => {
 		try {
+			setLoading(true);
             const storeApi = new StoreApi(
                 new Configuration({ basePath: API_BASE_PATH})
             );
 			await storeApi.saveStore({store});
-            navigate('/admin/stores');
+            navigateWithLoading('/admin/stores');
 			toast('Store saved successfully!', 'success');
 		} catch (error) {
 			console.error('Failed to save store:', error);
 			toast('Failed to save store. Please try again.', 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -101,7 +112,7 @@ const StoreDetails: React.FC = () => {
                     <Button variant="outlined" onClick={handleSave} className="save-button">
                         Save
                     </Button>
-                    <Button variant="outlined" onClick={() => navigate('/admin/stores')} className="cancel-button">
+                    <Button variant="outlined" onClick={() => navigateWithLoading('/admin/stores')} className="cancel-button">
                         Cancel
                     </Button>
                 </div>

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { useAtom } from 'jotai';
-import { userAtom } from '@utilities/atoms';
+import React, { useEffect, useState } from 'react';
+import { useLocation, Link } from 'react-router-dom';
+import { useAtom, useSetAtom } from 'jotai';
+import { userAtom, globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { Button } from '@mui/material';
 import { GroceryListItem } from '@models/GroceryListItem';
 import { UserProductApi } from '@apis/UserProductApi';
@@ -13,10 +14,15 @@ import styles from '../UserView.module.scss';
 const UserProductDetails: React.FC = () => {
 	const toast = useToast()
 	const location = useLocation();
-	const navigate = useNavigate(); // Initialize useNavigate
 	const [user] = useAtom(userAtom);
     const initialGroceryListItem = location.state?.initialGroceryListItem as GroceryListItem;
     const [groceryListItem, setGroceryListItem] = useState<GroceryListItem | undefined>(initialGroceryListItem);
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
+
+	useEffect(() => {
+		setLoading(false);
+    }, []);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
 		const { name, value } = e.target;
@@ -28,17 +34,20 @@ const UserProductDetails: React.FC = () => {
 
 	const handleSave = async () => {
         try {
+            setLoading(true);
             const userProductApi = new UserProductApi(
                 new Configuration({ basePath: API_BASE_PATH })
             );
             const success = await userProductApi.saveGroceryListItem({ groceryListItem });
             if (success) {
-                navigate('/userproducts');
+                navigateWithLoading('/userproducts');
                 toast('Product saved successfully!', 'success');
             }
         } catch (error) {
             console.error('Failed to save product:', error);
             toast('Failed to save product. Please try again.', 'error');
+        } finally {
+            setLoading(false);
         }
 	};
 
@@ -93,7 +102,7 @@ const UserProductDetails: React.FC = () => {
                     <Button variant="outlined" onClick={handleSave} className="save-button">
                         Save
                     </Button>
-                    <Button variant="outlined" onClick={() => navigate('/userproducts')} className="cancel-button">
+                    <Button variant="outlined" onClick={() => navigateWithLoading('/userproducts')} className="cancel-button">
                         Cancel
                     </Button>
                 </div>

@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useSetAtom } from 'jotai';
+import { globalLoadingAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import { Button, IconButton } from "@mui/material";
 import TextField from '@mui/material/TextField';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { ProductApi } from '@apis/ProductApi';
 import { Product } from '@models/Product';
@@ -17,11 +20,13 @@ const ProductPage: React.FC = () => {
 	const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 	const [searchTerm, setSearchTerm] = useState<string>('');
 	const [showSearch, setShowSearch] = useState<boolean>(false);
-	const navigate = useNavigate();
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
 
 	useEffect(() => {
 		const fetchProducts = async () => {
 			try {
+				setLoading(true);
 				const productApi = new ProductApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);
@@ -37,7 +42,9 @@ const ProductPage: React.FC = () => {
 				const errorMessage =
 					error.response?.data?.message || 'Failed to fetch products. Please check your network connection or server status.';
 				toast(errorMessage, 'error');
-			}
+			} finally {
+                setLoading(false);
+            }
 		};
 		fetchProducts();
 	}, []);
@@ -50,7 +57,7 @@ const ProductPage: React.FC = () => {
 	}, [searchTerm, products]);
 
 	const handleAddNewProduct = () => {
-		navigate('/admin/product/details', { state: { product: { id: 0 } } });
+		navigateWithLoading('/admin/product/details', { state: { product: { id: 0 } } });
 	};
 
 	const columns: GridColDef[] = [
@@ -63,7 +70,7 @@ const ProductPage: React.FC = () => {
 			disableColumnMenu: true,
 			renderCell: (params) => (
 				<IconButton
-					onClick={() => navigate(`/admin/product/details`, { state: { product: params.row } })}
+					onClick={() => navigateWithLoading(`/admin/product/details`, { state: { product: params.row } })}
 					style={{ color: 'var(--text-primary)', border: 'none', cursor: 'pointer', paddingBottom: '1rem' }}
 				>
 					<EditIcon />

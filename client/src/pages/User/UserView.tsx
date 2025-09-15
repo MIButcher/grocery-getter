@@ -1,28 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useToast } from '@context/toastContext';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { useAtom, useSetAtom } from 'jotai';
 import Button from '@mui/material/Button';
 import { IdNameLink } from '@models/IdNameLink';
 import { UserApi } from '@apis/UserApi';
 import { UserProductApi } from '@apis/UserProductApi';
 import { Configuration } from '@generated/runtime';
-import { userAtom, sharerIdAtom } from '@utilities/atoms';
+import { globalLoadingAtom, userAtom, sharerIdAtom } from '@utilities/atoms';
+import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import API_BASE_PATH from '@config/apiConfig';
 import styles from './UserView.module.scss';
+import { set } from 'lodash';
 
 const UserView: React.FC = () => {
 	const toast = useToast()
-	const navigate = useNavigate();
 	const [user] = useAtom(userAtom);
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [idNameLinks, setIdNameLinks] = useState<IdNameLink[]>([]);
 	const setSharerIdAtom = useSetAtom(sharerIdAtom);
+	const setLoading = useSetAtom(globalLoadingAtom);
+	const navigateWithLoading = useNavigateWithLoading();
 
 	useEffect(() => {
 		const fetchIdNameLinks = async () => {
 			try {
+				setLoading(true);
 				const userApi = new UserApi(
 					new Configuration({ basePath: API_BASE_PATH})
 				);
@@ -33,6 +36,8 @@ const UserView: React.FC = () => {
 				const errorMessage =
 					error.response?.data?.message || 'Failed to fetch shared Id Name links.'
 				toast(errorMessage, 'error');
+			} finally {
+				setLoading(false);
 			}
 		};
 		fetchIdNameLinks();
@@ -41,12 +46,13 @@ const UserView: React.FC = () => {
 	const handleSharedListClicked = async (sharerId: number | undefined) => {
 		if (sharerId) {
 			setSharerIdAtom(sharerId)
-			navigate(`/userProducts/shared`);
+			navigateWithLoading(`/userProducts/shared`);
 		}
 	}
 
 	const deleteGroceryList = async () => {
 		try {
+			setLoading(true);
 			const userProductApi = new UserProductApi(
 				new Configuration({ basePath: API_BASE_PATH})
 			);
@@ -58,6 +64,8 @@ const UserView: React.FC = () => {
 			const errorMessage =
 				error.response?.data?.message || 'Failed to delete products. Please try again later.';
 			toast(errorMessage, 'error');
+		} finally {
+			setLoading(false);
 		}
 	};
 	
@@ -68,7 +76,7 @@ const UserView: React.FC = () => {
 				<Button
 					key={`User Lists`}
 					variant="outlined"
-					onClick={() => navigate(`/userproducts`)}
+					onClick={() => navigateWithLoading(`/userproducts`)}
 				>
 					View List
 				</Button>
@@ -90,7 +98,7 @@ const UserView: React.FC = () => {
 				{user?.isAdmin &&
 				<Button
 					variant="outlined"
-					onClick={() => navigate(`/admin`)}
+					onClick={() => navigateWithLoading(`/admin`)}
 					style={{marginTop: '5rem'}}
 				>
 					Admin Dashboard
