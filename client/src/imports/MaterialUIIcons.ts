@@ -6,6 +6,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ContrastIcon from '@mui/icons-material/Contrast';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import Edit from '@mui/icons-material/Edit';
+import FavoriteSharpIcon from '@mui/icons-material/FavoriteSharp';
 import FormatSizeSharpIcon from '@mui/icons-material/FormatSizeSharp';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
@@ -21,6 +22,7 @@ export {
   ContrastIcon,
   DarkModeIcon,
   Edit as EditIcon,
+  FavoriteSharpIcon,
   FormatSizeSharpIcon,
   HighlightOffIcon,
   RemoveShoppingCartIcon,

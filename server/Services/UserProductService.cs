@@ -4,6 +4,7 @@ using GroceryGetter.DomainServices;
 using Microsoft.EntityFrameworkCore;
 using GroceryGetter.DomainServices.Models;
 using Npgsql;
+using System.Text.RegularExpressions;
 
 namespace GroceryGetter.Services
 {
@@ -133,6 +134,7 @@ namespace GroceryGetter.Services
         public async Task<AddUserProductsResult> AddUserProducts(UserProductsCriteria userProductsCriteria)
         {
             string unhandledProducts = "";
+
             if (!string.IsNullOrWhiteSpace(userProductsCriteria.ProductsList))
             {
                 var hiddenUserProducts = await _context.UserProduct
@@ -140,34 +142,126 @@ namespace GroceryGetter.Services
                     .ToListAsync();
                 var hiddenIds = hiddenUserProducts.Select(h => h.ProductId).ToList();
 
-                var productNames = userProductsCriteria.ProductsList.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(item => item.Trim().ToLower()) // Removes spaces, tabs, newlines
-                    .Where(item => !string.IsNullOrWhiteSpace(item)) // Optional: skip empty results
+                // Parse input string into structured entries
+                var parsedEntries = userProductsCriteria.ProductsList
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(entry => entry.Trim())
+                    .Where(entry => !string.IsNullOrWhiteSpace(entry))
+                    .Select(entry =>
+                    {
+                        int quantity = 1;
+                        string name = entry;
+                        string? notes = null;
+
+                        // Extract quantity if it starts with a number
+                        var quantityMatch = Regex.Match(entry, @"^(\d+)\s+");
+                        if (quantityMatch.Success)
+                        {
+                            quantity = int.Parse(quantityMatch.Groups[1].Value);
+                            entry = entry.Substring(quantityMatch.Length).Trim();
+                        }
+
+                        // Find last set of parentheses - treat as notes
+                        int lastOpen = entry.LastIndexOf('(');
+                        int lastClose = entry.LastIndexOf(')');
+                        if (lastOpen >= 0 && lastClose > lastOpen)
+                        {
+                            notes = entry.Substring(lastOpen + 1, lastClose - lastOpen - 1).Trim();
+                            if (notes.Length > 250) notes = notes.Substring(0, 250);
+                            name = entry.Substring(0, lastOpen).Trim();
+                        }
+                        else
+                        {
+                            name = entry.Trim();
+                        }
+
+                        return new
+                        {
+                            Quantity = quantity,
+                            Name = name.ToLower(),
+                            Notes = notes,
+                            OriginalEntry = entry.ToLower()
+                        };
+                    })
+                    .ToList();
+
+                var productNames = parsedEntries.Select(p => p.Name).ToList();
+
+                var allProductNames = parsedEntries
+                    .SelectMany(e => new[] { e.Name, e.OriginalEntry })
+                    .Distinct()
                     .ToList();
 
                 var products = await _context.Product
-                    .Where(p => productNames.Contains(p.Name.ToLower()))
+                    .Where(p => allProductNames.Contains(p.Name.ToLower()))
                     .ToListAsync();
 
-                foreach (var product in products)
+                var matchedProducts = new List<(Product product, dynamic entry)>();
+
+                foreach (var entry in parsedEntries)
                 {
-                    if (hiddenIds.Contains(product.Id))
+                    var product = products.FirstOrDefault(p => p.Name.ToLower() == entry.Name);
+                    var effectiveEntry = entry;
+
+                    // Fallback: try matching full entry including parentheses
+                    if (product == null && entry.Notes != null)
                     {
-                        var hiddenUserProduct = hiddenUserProducts.Find(h => h.ProductId ==  product.Id);
-                        hiddenUserProduct.IsHidden = false;
+                        string fallbackName = $"{entry.Name} ({entry.Notes})".ToLower();
+                        product = products.FirstOrDefault(p => p.Name.ToLower() == fallbackName);
+
+                        if (product != null)
+                        {
+                            effectiveEntry = new
+                            {
+                                entry.Quantity,
+                                Name = fallbackName,
+                                Notes = (string?)null,
+                                OriginalEntry = fallbackName
+                            };
+                        }
                     }
-                    else
+
+                    if (product == null) continue;
+
+                    matchedProducts.Add((product, effectiveEntry));
+                    productNames.Remove(product.Name.ToLower());
+                }
+
+                foreach (var (product, entry) in matchedProducts)
+                {
+                    var hiddenUserProduct = hiddenUserProducts.FirstOrDefault(h => h.ProductId == product.Id);
+                    bool shouldAddNew = hiddenUserProduct == null;
+
+                    if (hiddenUserProduct != null)
+                    {
+                        bool notesMatch = string.Equals(
+                            hiddenUserProduct.Notes?.Trim(),
+                            entry.Notes?.Trim(),
+                            StringComparison.OrdinalIgnoreCase
+                        );
+
+                        if (notesMatch)
+                        {
+                            hiddenUserProduct.IsHidden = false;
+                        }
+                        else
+                        {
+                            shouldAddNew = true;
+                        }
+                    }
+
+                    if (shouldAddNew)
                     {
                         var userProduct = new UserProduct()
                         {
                             UserId = userProductsCriteria.UserId,
                             ProductId = product.Id,
                             InCart = false,
-                            Quantity = 1,
+                            Quantity = entry.Quantity,
+                            Notes = entry.Notes
                         };
                         _context.UserProduct.Add(userProduct);
                     }
-                    productNames.Remove(product.Name.ToLower());
                 }
 
                 await _context.SaveChangesAsync();
@@ -181,7 +275,11 @@ namespace GroceryGetter.Services
                 .FromSqlRaw(sql, userIdParam, storeIdParam)
                 .ToListAsync();
 
-            return new AddUserProductsResult() { UnhandledProductsList = unhandledProducts, GroceryListItems = results.FindAll(r => !r.IsHidden) };
+            return new AddUserProductsResult()
+            {
+                UnhandledProductsList = unhandledProducts,
+                GroceryListItems = results.FindAll(r => !r.IsHidden)
+            };
         }
 
         public async Task<List<GroceryListItem>> MergeUserProducts(UserProductsMergeCriteria userProductsMergeCriteria)
@@ -291,7 +389,11 @@ namespace GroceryGetter.Services
                 .Where(up => criteria.UserId == up.UserId && up.IsHidden)
                 .ToListAsync();
 
-            hiddenUserProducts.ForEach(h => h.IsHidden = false);
+            hiddenUserProducts.ForEach(h =>
+            {
+                h.IsHidden = false;
+                h.InCart = false;
+            });
             await _context.SaveChangesAsync();
             var sql = "SELECT * FROM get_grocery_list_items(@p_user_id, @p_store_id);";
             var userIdParam = new NpgsqlParameter("p_user_id", criteria.UserId);

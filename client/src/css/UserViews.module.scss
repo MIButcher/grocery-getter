@@ -49,10 +49,12 @@
     }
 
     .gridContainer {
-        height: 68vh;
+        flex: 1;
+        overflow-y: auto;
         border: 1px solid var(--border-color);
         border-radius: 0.5rem;
         background-color: var(--table-background-color);
+        margin: 0 0 0.5rem 0;
     }
 
 	.form {
@@ -125,6 +127,46 @@
         label {
             margin-bottom: 0.313rem;
         }
+    }
+
+    .userProductCell {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        width: 100%;
+        overflow: visible;
+        height: inherit;
+
+        button {
+            height: inherit;
+        
+            .icon {
+                font-size: 1rem;
+                height: inherit;
+            }
+        }
+    }
+
+    .textBlock {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        align-items: center;
+        height: 100%;
+        line-height: 1;
+        cursor: pointer;
+        text-decoration: underline;
+        color: var(--text-primary);
+        word-break: break-word;
+    }
+
+    .productName {
+        margin-right: 4px;
+    }
+
+    .productNotes {
+        color: var(--text-secondary);
     }
 
     .lineThrough {
