@@ -12,7 +12,7 @@ import { UserApi } from '@apis/UserApi';
 import { UserProductApi } from '@apis/UserProductApi';
 import { GroceryListItem } from '@models/GroceryListItem';
 import { Configuration } from '@generated/runtime';
-import { AddShoppingCartIcon, FormatSizeSharpIcon, HighlightOffIcon, RemoveShoppingCartIcon, SearchIcon } from '@imports/MaterialUIIcons';
+import { AddShoppingCartIcon, FavoriteSharpIcon, FormatSizeSharpIcon, HighlightOffIcon, RemoveShoppingCartIcon, SearchIcon } from '@imports/MaterialUIIcons';
 import { sendSMS } from '@utilities/sendSMS';
 import { useNavigateWithLoading } from '@hooks/HandleNavigateWithLoading';
 import API_BASE_PATH from '@config/apiConfig';
@@ -34,10 +34,11 @@ const UserProductPage: React.FC = () => {
 	const [openEmailModal, setOpenEmailModal] = useState(false);
 	const [emailInput, setEmailInput] = useState('');
   	const [displayMode, setDisplayMode] = useAtom(displayModeAtom);
-	const rowHeight = displayMode === 2 ? 32 : 64;
+	const rowHeight = displayMode === 2 ? 36 : 64;
 	const fontSize = displayMode === 1 ? '1.25rem' : '0.875rem';
 	const setLoading = useSetAtom(globalLoadingAtom);
 	const navigateWithLoading = useNavigateWithLoading();
+	interface ParsedProduct { quantity?: number; name: string; notes?: string; }
 
 	useEffect(() => {
 		const fetchUserProducts = async () => {
@@ -132,25 +133,14 @@ const UserProductPage: React.FC = () => {
 
 		let pastedText = e.clipboardData.getData('text');
 
-		// Normalize weird spacing and line breaks
-		pastedText = pastedText
-			.replace(/\u00A0/g, ' ') // non-breaking space
-			.replace(/\u200B/g, '')  // zero-width space
-			.replace(/\r\n|\r|\n/g, '\n') // normalize all line breaks to \n
-
-		const transformed = pastedText
-			.split(/[\n,\u2028\u2029]/) // split on normalized line breaks, commas, and unicode separators
-			.map(s => s.trim())
-			.filter(Boolean)
+		var updatedText = pastedText
+			.split(/[\u00A0\u200B,\n\r]+/)    // Split on invisible spaces, commas, and line breaks
+			.map(item => item.trim())
+			.filter(item => item.length > 0)
 			.join(', ');
 
-		const input = e.target as HTMLInputElement;
-		const cursorPos = input.selectionStart ?? typedList.length;
-		const newValue =
-			typedList.slice(0, cursorPos) + transformed + typedList.slice(cursorPos);
-
-		setTypedList(newValue);
-		handleAddUserProducts(newValue);
+		setTypedList(updatedText);
+		handleAddUserProducts(updatedText);
 	};
 
 	const handleAddUserProducts = (e: string, newStoreId?: number) => {
@@ -339,25 +329,32 @@ const UserProductPage: React.FC = () => {
 			sortable: false,
 			disableColumnMenu: true,
 			renderCell: (params) => {
-				const data = params.row.notes ? params.value + ' (' + params.row.notes + ')' : params.value;
+				const name = params.value;
+				const notes = params.row.notes;
+
 				return (
-				<span
-				onClick={() => handleProductNameClick(params.row)}
-				style={{
-					cursor: 'pointer',
-					textDecoration: 'underline',
-					color: 'var(--text-primary)',
-				}}
-				>
-				{data}
-				</span>
-			)},
+					<div className={styles.userProductCell}>
+						<div className={styles.textBlock} onClick={() => handleProductNameClick(params.row)}>
+							<span className={styles.productName}>{name}</span>
+							{notes && <span className={styles.productNotes}>({notes})</span>}
+						</div>
+						{params.row.isFavorite && (
+							<IconButton
+								size="small"
+							style={{ color: 'var(--text-primary)', padding: 0, marginLeft: 4 }}
+							>
+								<FavoriteSharpIcon className={styles.icon} />
+							</IconButton>
+						)}
+					</div>
+				);
+			},
 		},
 		{ field: 'quantity', headerName: 'Qty', width: 45, sortable: false, disableColumnMenu: true },
 		{
 			field: 'actions',
 			headerName: '',
-			width: 50,
+			width: 45,
 			sortable: false,
 			disableColumnMenu: true,
 			renderHeader: () => (
@@ -435,6 +432,10 @@ const UserProductPage: React.FC = () => {
 					sx={{
 						'& .MuiDataGrid-row': {
 						fontSize,
+						},
+						'& .productNotes': {
+							fontSize: fontSize,
+							color: 'var(--text-secondary)',
 						},
 					}}
 				/>
